@@ -10,19 +10,26 @@ public class GameUIScript : MonoBehaviour
     public GameObject pauseUI;
     public GameObject optionsMenuUI;
 
+    public CanvasGroup topUI;
     public GameObject livesUIGroup;
     public GameObject gemsUIGroup;
     public GameObject spiritsUIGroup;
+
+    private void Awake()
+    {
+        // Set lives, gems and spirits based on save data
+        Text livesText = livesUIGroup.GetComponentsInChildren<Text>()[0];
+        livesText.text = "x " + GameManager.livesCount;
+        Text gemsText = gemsUIGroup.GetComponentsInChildren<Text>()[0];
+        gemsText.text = "x " + GameManager.gemsCount;
+        Text spiritsText = spiritsUIGroup.GetComponentsInChildren<Text>()[0];
+        spiritsText.text = "x " + GameManager.spiritCount;
+    }
 
     private void Start()
     {
         
         inGameUI.SetActive(true);
-
-        // Set lives, gems and spirits based on save data
-        UpdateLivesCountOnUI();
-        UpdateGemsCountOnUI();
-        UpdateSpiritsCountOnUI();
         
         // Set options UI to match loaded data
         OptionsDataObject optionsData = GameManager.LoadOptionsData();
@@ -185,39 +192,50 @@ public class GameUIScript : MonoBehaviour
     public void UpdateLivesCountOnUI()
     {
         Text livesText = livesUIGroup.GetComponentsInChildren<Text>()[0];
-        StartCoroutine(UIJumpAnimation(livesUIGroup, 0.07f));
+        StartCoroutine(UIJumpAnimation(livesUIGroup, 0.1f));
         livesText.text = "x " + GameManager.livesCount;
     }
 
     public void UpdateGemsCountOnUI()
     {
         Text gemsText = gemsUIGroup.GetComponentsInChildren<Text>()[0];
-        StartCoroutine(UIJumpAnimation(gemsUIGroup, 0.07f));
+        StartCoroutine(UIJumpAnimation(gemsUIGroup, 0.1f));
         gemsText.text = "x " + GameManager.gemsCount;
     }
 
     public void UpdateSpiritsCountOnUI()
     {
         Text spiritsText = spiritsUIGroup.GetComponentsInChildren<Text>()[0];
-        StartCoroutine(UIJumpAnimation(spiritsUIGroup, 0.07f));
+        StartCoroutine(UIJumpAnimation(spiritsUIGroup, 0.1f));
         spiritsText.text = "x " + GameManager.spiritCount;
+    }
+
+    public void FadeInTopUI()
+    {
+        StartCoroutine(UIFadeIn(topUI, 1));
+    }
+
+    public void FadeOutTopUI()
+    {
+        StartCoroutine(UIFadeOut(topUI, 1));
     }
 
     private IEnumerator UIJumpAnimation(GameObject uiGroup, float duration)
     {
         Text text = uiGroup.GetComponentsInChildren<Text>()[0];
         RectTransform uiRectTransform = uiGroup.GetComponent<RectTransform>();
-        print("start: " + uiRectTransform.anchoredPosition);
+
         float originalYPos = uiRectTransform.anchoredPosition.y;
+        Color originalColor = text.color;
         // Jump and color fade animation
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {
-            text.color = new Color(Mathf.Lerp(1,text.color.r,i), Mathf.Lerp(1, text.color.g, i), Mathf.Lerp(1, text.color.b, i), 255);
+            text.color = Color.Lerp(Color.white, originalColor, i);
             uiRectTransform.anchoredPosition = new Vector2(uiRectTransform.anchoredPosition.x,
                 (float)Mathf.Lerp(originalYPos, originalYPos+20, i));
             yield return null;
         }
-        print("mid: " + uiRectTransform.anchoredPosition);
+        text.color = originalColor;
 
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {
@@ -226,5 +244,25 @@ public class GameUIScript : MonoBehaviour
             yield return null;
         }
         uiRectTransform.anchoredPosition = new Vector2(uiRectTransform.anchoredPosition.x, originalYPos);
+    }
+
+    private IEnumerator UIFadeIn(CanvasGroup canvasGroup, float duration)
+    {
+        for (float i = 0; i < 1; i += Time.deltaTime / duration)
+        {
+            canvasGroup.alpha = Mathf.Lerp(0, 1, i);
+            yield return null;
+        }
+        canvasGroup.alpha = 1;
+    }
+
+    private IEnumerator UIFadeOut(CanvasGroup canvasGroup, float duration)
+    {
+        for (float i = 0; i < 1; i += Time.deltaTime / duration)
+        {
+            canvasGroup.alpha = Mathf.Lerp(1, 0, i);
+            yield return null;
+        }
+        canvasGroup.alpha = 0;
     }
 }

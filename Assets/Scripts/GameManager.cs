@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour
         // Fade in animation
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {
-            transitionImage.color = new Color(36, 36, 36, Mathf.Lerp(0, 1, i));
+            transitionImage.color = new Color(0.05f, 0.05f, 0.05f, Mathf.Lerp(0, 1, i));
             yield return null;
         }
 
@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
         // Fade out animation
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {
-            transitionImage.color = new Color32(36, 36, 36, (byte)Mathf.Lerp(255, 0, i));
+            transitionImage.color = new Color(0.05f, 0.05f, 0.05f, Mathf.Lerp(1, 0, i));
             yield return null;
         }
     }
@@ -96,11 +96,11 @@ public class GameManager : MonoBehaviour
         SetupLocalGameStateVariables(saveData);
         if (playerLocation == "mainForest" && !hasCompletedEvent1)
         {
-            LoadScene(2, 0.3f);
+            LoadScene(2, 0.5f);
         }
         else if (playerLocation == "mainForest")
         {
-            LoadScene(3, 0.3f);
+            LoadScene(3, 0.5f);
         }
     }
 

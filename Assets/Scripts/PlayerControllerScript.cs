@@ -51,9 +51,9 @@ public class PlayerControllerScript : MonoBehaviour
                 checkpoint = checkpoints[i];
             }
         }
-        print("go transaform: " + gameObject.transform.position + " | checkpoint pos: " + checkpoint.transform.position);
+        print("SPAWN player transform before: " + gameObject.transform.position + " | checkpoint pos: " + checkpoint.transform.position);
         gameObject.transform.position = checkpoint.transform.position;
-        print("go transform after: " + gameObject.transform.position);
+        print("SPAWN player transform after: " + gameObject.transform.position);
     }
 
     void Update()
