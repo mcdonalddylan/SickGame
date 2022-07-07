@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
@@ -9,6 +10,7 @@ public class OptionsMenuScript : MonoBehaviour
     public Slider resolutionScaleSlider;
     public Dropdown textureDropdown;
     public Toggle shadowToggle;
+    public Toggle particlesToggle;
     public Toggle dofToggle;
     public Toggle ssaoToggle;
     public Toggle bloomToggle;
@@ -20,10 +22,27 @@ public class OptionsMenuScript : MonoBehaviour
     private Volume postprocessingVolume;
     private Camera mainCamera;
 
+    // For enabling and disabling particle effects
+    private MainMenuScript mainUIScript;
+
     private void Awake()
     {
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        postprocessingVolume = GameObject.FindGameObjectWithTag("GlobalVolume").GetComponent<Volume>();
+        try
+        {
+            postprocessingVolume = GameObject.FindGameObjectWithTag("GlobalVolume").GetComponent<Volume>();
+        }
+        catch (NullReferenceException e)
+        {
+            Debug.Log("No global volume found in this scene");
+        }
+        try
+        {
+            mainUIScript = GameObject.FindGameObjectWithTag("mainUIScript").GetComponent<MainMenuScript>();
+        } catch (NullReferenceException e)
+        {
+            Debug.Log("No main menu script found in this scene");
+        }
     }
 
     private void Start()
@@ -31,6 +50,7 @@ public class OptionsMenuScript : MonoBehaviour
         resolutionScaleSlider.onValueChanged.AddListener(delegate { ResolutionScaleChanged(); });
         textureDropdown.onValueChanged.AddListener(delegate { TextureQualityChanged(); });
         shadowToggle.onValueChanged.AddListener(delegate { ShadowQualityChanged(); });
+        particlesToggle.onValueChanged.AddListener(delegate { ToggleParticles(); });
         dofToggle.onValueChanged.AddListener(delegate { ToggleDof(); });
         ssaoToggle.onValueChanged.AddListener(delegate { ToggleSSAO(); });
         bloomToggle.onValueChanged.AddListener(delegate { ToggleBloom(); });
@@ -81,6 +101,27 @@ public class OptionsMenuScript : MonoBehaviour
             urpSettings.shadowCascadeCount = 1;
             urpSettings.shadowDistance = 50;
         }
+    }
+
+    private void ToggleParticles()
+    {
+        if (particlesToggle.isOn)
+        {
+            GameManager.particleEffectsEnabled = true;
+            if(mainUIScript != null)
+            {
+                mainUIScript.ReAddBGParticles();
+            }
+        }
+        else
+        {
+            GameManager.particleEffectsEnabled = false;
+            if (mainUIScript != null)
+            {
+                mainUIScript.RemoveBGParticles();
+            }
+        }
+        print(GameManager.particleEffectsEnabled);
     }
 
     private void ToggleDof()

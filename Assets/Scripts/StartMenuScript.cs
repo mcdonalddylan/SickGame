@@ -24,6 +24,9 @@ public class StartMenuScript : MonoBehaviour
     public Volume postprocessingVolume;
     private Camera mainCamera;
 
+    // Particle Effects
+    public GameObject menuGlowParticles;
+
     void Start()
     {
         startMenuUI.SetActive(true);
@@ -110,6 +113,16 @@ public class StartMenuScript : MonoBehaviour
         else if (optionsData.textureQuality == "LOL")
         {
             QualitySettings.masterTextureLimit = 2;
+        }
+
+        if (optionsData.particleEffectsEnabled)
+        {
+            menuGlowParticles = Instantiate(menuGlowParticles, new Vector3(0,0,0), Quaternion.identity);
+            GameManager.particleEffectsEnabled = true;
+        }
+        else
+        {
+            GameManager.particleEffectsEnabled = false;
         }
 
         ssaoFeature.SetActive(optionsData.hasSSAO);

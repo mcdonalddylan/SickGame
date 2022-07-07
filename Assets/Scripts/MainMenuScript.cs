@@ -11,6 +11,8 @@ public class MainMenuScript : MonoBehaviour
     public GameObject Adventurer2Image;
     public GameObject Adventurer3Image;
     public GameObject Adventurer4Image;
+
+    public GameObject menuGlowParticles;
     void Start()
     {
         // Set deafult number of active players
@@ -43,15 +45,22 @@ public class MainMenuScript : MonoBehaviour
         }
         Toggle shadowToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[0];
         shadowToggle.isOn = optionsData.hasQualityShadows;
-        Toggle dofToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[1];
+        Toggle particlesToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[1];
+        particlesToggle.isOn = optionsData.particleEffectsEnabled;
+        Toggle dofToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[2];
         dofToggle.isOn = optionsData.hasDOF;
-        Toggle ssaoToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[2];
+        Toggle ssaoToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[3];
         ssaoToggle.isOn = optionsData.hasSSAO;
-        Toggle bloomToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[3];
+        Toggle bloomToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[4];
         bloomToggle.isOn = optionsData.hasBloom;
-        Toggle fxaaToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[4];
+        Toggle fxaaToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[5];
         fxaaToggle.isOn = optionsData.hasFXAA;
         optionsMenuUI.SetActive(false);
+
+        if (GameManager.particleEffectsEnabled)
+        {
+            menuGlowParticles.SetActive(true);
+        }
 
         Button adventureButton = mainMenuUI.GetComponentsInChildren<Button>()[0];
         adventureButton.Select();
@@ -128,13 +137,15 @@ public class MainMenuScript : MonoBehaviour
         }
         Toggle shadowToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[0];
         updatedOptionsData.hasQualityShadows = shadowToggle.isOn;
-        Toggle dofToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[1];
+        Toggle particlesToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[1];
+        updatedOptionsData.particleEffectsEnabled = particlesToggle.isOn;
+        Toggle dofToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[2];
         updatedOptionsData.hasDOF = dofToggle.isOn;
-        Toggle ssaoToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[2];
+        Toggle ssaoToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[3];
         updatedOptionsData.hasSSAO = ssaoToggle.isOn;
-        Toggle bloomToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[3];
+        Toggle bloomToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[4];
         updatedOptionsData.hasBloom = bloomToggle.isOn;
-        Toggle fxaaToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[4];
+        Toggle fxaaToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[5];
         updatedOptionsData.hasFXAA = fxaaToggle.isOn;
         GameManager.SaveOptionsData(updatedOptionsData);
 
@@ -168,5 +179,15 @@ public class MainMenuScript : MonoBehaviour
     public void SelectingAdventure()
     {
         GameManager.LoadInGameScene();
+    }
+
+    public void RemoveBGParticles()
+    {
+        menuGlowParticles.SetActive(false);
+    }
+
+    public void ReAddBGParticles()
+    {
+        menuGlowParticles.SetActive(true);
     }
 }

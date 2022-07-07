@@ -19,7 +19,10 @@ public class GemScript : MonoBehaviour
             gameUI.UpdateGemsCountOnUI();
 
             // replace self with particle effect and then destroy self after particle effect
-            Instantiate(particleEffect, gameObject.transform.position, Quaternion.identity);
+            if (GameManager.particleEffectsEnabled)
+            {
+                Instantiate(particleEffect, gameObject.transform.position, Quaternion.identity);
+            }
             Destroy(gameObject);
         }
     }

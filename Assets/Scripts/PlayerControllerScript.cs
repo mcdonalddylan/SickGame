@@ -42,6 +42,11 @@ public class PlayerControllerScript : MonoBehaviour
     private void FindCheckpointAndSpawn()
     {
         GameObject[] checkpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
+        foreach(GameObject cp in checkpoints)
+        {
+            print("name of checkpoint: " + cp.name);
+        }
+        print("Game manager current checkpoint: " + GameManager.playerCheckpoint);
         GameObject checkpoint = new GameObject();
         for (int i = 0; i < checkpoints.Length; i++)
         {
@@ -51,9 +56,9 @@ public class PlayerControllerScript : MonoBehaviour
                 checkpoint = checkpoints[i];
             }
         }
-        print("SPAWN player transform before: " + gameObject.transform.position + " | checkpoint pos: " + checkpoint.transform.position);
-        gameObject.transform.position = checkpoint.transform.position;
-        print("SPAWN player transform after: " + gameObject.transform.position);
+        print("SPAWN player transform before: " + gameObject.transform.localPosition + " | checkpoint pos: " + checkpoint.transform.position);
+        gameObject.transform.localPosition = checkpoint.transform.position;
+        print("SPAWN player transform after: " + gameObject.transform.localPosition);
     }
 
     void Update()
@@ -71,6 +76,7 @@ public class PlayerControllerScript : MonoBehaviour
         {
             move = new Vector3(horizontalAxis * 1.5f, 0, 0);
         }
+        Physics.SyncTransforms();
         controller.Move(move * Time.deltaTime * playerSpeed);
 
         // Forces the player to face left or right

@@ -11,6 +11,7 @@ public class CutsceneManager : MonoBehaviour
         {
             SaveObject saveData = GameManager.LoadSlotData(GameManager.currentlySelectedSaveSlot);
             saveData.hasCompletedEvent1 = true;
+            GameManager.hasCompletedEvent1 = true;
             GameManager.SaveSlotData(saveData, GameManager.currentlySelectedSaveSlot);
             GameManager.LoadScene(3);
         }

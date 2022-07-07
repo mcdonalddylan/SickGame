@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: c58c0117bd31eec4d85d5079051c3f1c, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -3898,6 +3898,7 @@ MonoBehaviour:
   urpSettings: {fileID: 11400000, guid: ead13f8578dab524b99a35ba622669b4, type: 2}
   ssaoFeature: {fileID: 4717097110694157452, guid: ee133cb67395bc249bf67be47cc5d1c9, type: 2}
   postprocessingVolume: {fileID: 1585677091}
+  menuGlowParticles: {fileID: 8111263712731557052, guid: a861449bdfc62a84088f7b623ae5de2d, type: 3}
 --- !u!1 &1412303061
 GameObject:
   m_ObjectHideFlags: 0

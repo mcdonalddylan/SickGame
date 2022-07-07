@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: a1f61e1f7e20b984cbc8c59a546d28eb, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -525,11 +525,15 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: a13ecee4-c3bf-4372-bfcb-32824e525020
     m_ActionName: Player1/Pause[/XInputControllerWindows/start,/Keyboard/enter]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 93b806c4-ab2c-4e35-9c70-82f6335ef9f5
+    m_ActionName: Player1/VerticalMovement[/XInputControllerWindows/leftStick/y,/Keyboard/s,/Keyboard/w]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard
   m_DefaultActionMap: Player1
   m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 35818992}
 --- !u!4 &442778617
 Transform:
   m_ObjectHideFlags: 0
