@@ -8,10 +8,11 @@ public class PlayerControllerScript : MonoBehaviour
 {
     private float playerSpeed = 10.0f;
     private float smallJumpHeight = 0.65f;
-    private float longJumpHeight = 1.1f;
+    private float longJumpHeight = 2f;
     private float gravityValue = -65f;
 
     private CharacterController controller;
+    private PlayerParticleScript particleScript;
     private Vector3 playerVelocity;
     private bool groundedPlayer;
     private bool smallJump;
@@ -33,9 +34,12 @@ public class PlayerControllerScript : MonoBehaviour
     public static bool doubleJumpState;
     public static bool attackState;
 
+    private bool emitLandingParticles = false;
+
     private void Start()
     {
         controller = gameObject.GetComponent<CharacterController>();
+        particleScript = gameObject.GetComponent<PlayerParticleScript>();
         FindCheckpointAndSpawn();
     }
 
@@ -59,6 +63,7 @@ public class PlayerControllerScript : MonoBehaviour
         print("SPAWN player transform before: " + gameObject.transform.localPosition + " | checkpoint pos: " + checkpoint.transform.position);
         gameObject.transform.localPosition = checkpoint.transform.position;
         print("SPAWN player transform after: " + gameObject.transform.localPosition);
+        Physics.SyncTransforms();
     }
 
     void Update()
@@ -70,13 +75,23 @@ public class PlayerControllerScript : MonoBehaviour
             jumpState = false;
         }
 
+        //print("emit particles: " + emitLandingParticles);
+        //print("groundedPlayer: "+ groundedPlayer);
+        //print("jump state: " + jumpState);
+        //if (!emitLandingParticles && groundedPlayer && !jumpState)
+        //{
+            //print("SHOULD BE RENDERING LANDING PARTCILES");
+            //particleScript.EmitLandingParticles();
+            //emitLandingParticles = true;
+        //}
+        
+
         Vector3 move = new Vector3(horizontalAxis, 0, 0);
         // Can move faster left and right while air borne
         if (jumpState)
         {
             move = new Vector3(horizontalAxis * 1.5f, 0, 0);
         }
-        Physics.SyncTransforms();
         controller.Move(move * Time.deltaTime * playerSpeed);
 
         // Forces the player to face left or right
@@ -84,7 +99,6 @@ public class PlayerControllerScript : MonoBehaviour
         //{
         //    gameObject.transform.eulerAngles = move;
         //}
-
         // Changes the height position of the player
         if (smallJump && groundedPlayer)
         {
@@ -114,7 +128,11 @@ public class PlayerControllerScript : MonoBehaviour
         {
             jumpState = true;
             smallJump = true;
+            emitLandingParticles = false;
+            particleScript.EmitRunningAndJumpingParticles();
+            particleScript.EmitDashTrail();
         }
+        //print(emitLandingParticles);
     }
 
     public void HorizontalAxis(InputAction.CallbackContext context)

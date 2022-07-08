@@ -228,7 +228,7 @@ public class GameUIScript : MonoBehaviour
         Text text = uiGroup.GetComponentsInChildren<Text>()[0];
         RectTransform uiRectTransform = uiGroup.GetComponent<RectTransform>();
 
-        float originalYPos = uiRectTransform.anchoredPosition.y;
+        float originalYPos = 200f;
         Color originalColor = text.color;
         // Jump and color fade animation
         for (float i = 0; i < 1; i += Time.deltaTime / duration)

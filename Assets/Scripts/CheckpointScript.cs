@@ -7,16 +7,18 @@ public class CheckpointScript : MonoBehaviour
     [SerializeField]
     public int checkpointNumber = 0;
     public BoxCollider collider;
-    public ParticleSystem checkPointBeam;
+    public ParticleSystem checkpointBeam;
+    public Light checkpointLight; 
 
     private void Awake()
     {
-        checkPointBeam.gameObject.SetActive(false);
+        checkpointBeam.gameObject.SetActive(false);
+        checkpointLight.gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag.Equals("Player"))
+        if (other.tag.Equals("Player") && GameManager.playerCheckpoint != checkpointNumber)
         {
             GameManager.playerCheckpoint = checkpointNumber;
 
@@ -26,12 +28,31 @@ public class CheckpointScript : MonoBehaviour
             {
                 if (cp.checkpointNumber != GameManager.playerCheckpoint)
                 {
-                    cp.checkPointBeam.gameObject.SetActive(false);
+                    cp.checkpointBeam.gameObject.SetActive(false);
+                    cp.checkpointLight.gameObject.SetActive(false);
                 }
             }
 
-            checkPointBeam.gameObject.SetActive(true);
-            checkPointBeam.Play();
+            checkpointBeam.gameObject.SetActive(true);
+            checkpointBeam.Play();
+
+            FadeInLight();
         }
+    }
+
+    private void FadeInLight()
+    {
+        StartCoroutine(FadeInLight(0.8f));
+    }
+
+    private IEnumerator FadeInLight(float duration)
+    {
+        checkpointLight.gameObject.SetActive(true);
+        for (float i = 0; i < 1; i += Time.deltaTime / duration)
+        {
+            checkpointLight.intensity = Mathf.Lerp(0, 1, i);
+            yield return null;
+        }
+        checkpointLight.intensity = 1;
     }
 }

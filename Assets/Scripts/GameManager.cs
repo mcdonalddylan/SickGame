@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviour
         hasCompletedEvent2 = so.hasCompletedEvent2;
         hasCompletedEvent3 = so.hasCompletedEvent3;
         hasCompletedStory = so.hasCompletedStory;
-}
+    }
 
     //------------------------
     // SAVING AND LOADING DATA
