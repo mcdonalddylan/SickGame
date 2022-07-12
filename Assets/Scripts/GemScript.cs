@@ -7,6 +7,33 @@ public class GemScript : MonoBehaviour
     public SphereCollider collider;
     public GameObject particleEffect;
 
+    private void Start()
+    {
+        StartCoroutine(AnimateGems(0.4f));    
+    }
+
+    private IEnumerator AnimateGems(float duration)
+    {
+        Vector3 originalPos = gameObject.transform.position;
+        Vector3 adjustedPos = new Vector3(originalPos.x, originalPos.y + 0.4f, originalPos.z);
+        while (true)
+        {
+            for(float i = 0; i < 1; i += Time.deltaTime / duration)
+            {
+                gameObject.transform.position = Vector3.Lerp(originalPos, adjustedPos, Mathf.SmoothStep(0.0f, 1.0f, i));
+                yield return null;
+            }
+            gameObject.transform.position = adjustedPos;
+
+            for (float i = 0; i < 1; i += Time.deltaTime / duration)
+            {
+                gameObject.transform.position = Vector3.Lerp(adjustedPos, originalPos, Mathf.SmoothStep(0.0f, 1.0f, i));
+                yield return null;
+            }
+            gameObject.transform.position = originalPos;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag.Equals("Player"))
