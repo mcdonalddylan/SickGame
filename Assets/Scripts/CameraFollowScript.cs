@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class CameraFollowScript : MonoBehaviour
 {
-    private Vector3 FACE_RIGHT_OFFSET = new Vector3(3.5f, 1.5f, -10);
-    private Vector3 FACE_LEFT_OFFSET = new Vector3(-3.5f, 1.5f, -10);
+    private Vector3 FACE_RIGHT_OFFSET = new Vector3(3.5f, 1.5f, -12);
+    private Vector3 FACE_LEFT_OFFSET = new Vector3(-3.5f, 1.5f, -12);
     [SerializeField]
     private Transform playerTarget;
     [SerializeField]
@@ -23,13 +23,25 @@ public class CameraFollowScript : MonoBehaviour
     {
         if (isFollowingPlayer)
         {
+            // If the player is facing the right direction, use the "right facing" camera offset
             if (playerTarget.gameObject.GetComponent<PlayerControllerScript>().faceRightState)
             {
                 offset = FACE_RIGHT_OFFSET;
             }
+            // If the player is facing the left direction, use the "left facing" camera offset
             else
             {
                 offset = FACE_LEFT_OFFSET;
+            }
+            // If the player's speed is greater than 1, increase the smooth speed to the normal amount
+            if (Mathf.Abs(playerTarget.gameObject.GetComponent<PlayerControllerScript>().playerXVelocity) >= 1)
+            {
+                smoothSpeedFactor = 0.125f;
+            }
+            // If the player's speed is greater than 1, increase the smooth speed to the normal amount
+            else
+            {
+                smoothSpeedFactor = 0.65f;
             }
             Vector3 desiredPosition = playerTarget.position + offset;
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, smoothSpeedFactor);

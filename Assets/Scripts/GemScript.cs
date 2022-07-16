@@ -6,9 +6,14 @@ public class GemScript : MonoBehaviour
 {
     public SphereCollider collider;
     public GameObject particleEffect;
+    public Light gemPointLight;
 
     private void Start()
     {
+        if (!GameManager.particleEffectsEnabled)
+        {
+            gemPointLight.gameObject.SetActive(false);
+        }
         StartCoroutine(AnimateGems(0.4f));    
     }
 
@@ -40,8 +45,8 @@ public class GemScript : MonoBehaviour
         {
             collider.enabled = false;
             GameManager.gemsCount += 1;
-            //CameraFollowScript camScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollowScript>();
-            //camScript.ShakeCamera(0.2f);
+            CameraFollowScript camScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollowScript>();
+            camScript.ShakeCamera(0.2f);
             GameUIScript gameUI = GameObject.FindGameObjectWithTag("InGameUI").GetComponent<GameUIScript>();
             gameUI.UpdateGemsCountOnUI();
 

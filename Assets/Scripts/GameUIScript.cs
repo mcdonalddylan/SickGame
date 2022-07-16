@@ -229,7 +229,7 @@ public class GameUIScript : MonoBehaviour
         RectTransform uiRectTransform = uiGroup.GetComponent<RectTransform>();
 
         float originalYPos = 200f;
-        Color originalColor = text.color;
+        Color originalColor = new Color32(50,50,50,255);
         // Jump and color fade animation
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {

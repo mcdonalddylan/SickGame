@@ -8,18 +8,24 @@ public class PlayerControllerScript : MonoBehaviour
 {
     private Vector3 FACING_LEFT = new Vector3(0, 180, 0);
     private Vector3 FACING_RIGHT = Vector3.zero;
+    private float MAX_ACCELERATION = 2f;
 
     private float playerSpeed = 10.0f;
     private float smallJumpHeight = 0.3f;
     private float longJumpHeight = 0.8f;
-    private float gravityValue = -12.5f;
+    private float gravityValue = 12.5f;
 
     private CharacterController controller;
     private PlayerParticleScript particleScript;
-    private float playerYVelocity;
+    public float playerYVelocity;
+    public float playerXVelocity;
+    private float decelerationDirection = -1;
+    private float decelerationVelocity;
     private float inAirTimer; // needed to determine when landing 
     private bool groundedPlayer;
+    private float groundedTimer; // needed to allow player to jump while going down ramp
     private bool smallJump;
+    private bool triggeredFirstJump;
     private bool triggeredSmallJump;
     private bool longJump;
     private float horizontalAxis;
@@ -63,7 +69,7 @@ public class PlayerControllerScript : MonoBehaviour
             }
         }
         gameObject.transform.localPosition = checkpoint.transform.position;
-        Physics.SyncTransforms();  // needed to avoid a bug where the player doesn't spawn
+        Physics.SyncTransforms();  // needed to avoid a bug where the player doesn't spawn every time you load the level
     }
 
     void Update()
@@ -73,56 +79,101 @@ public class PlayerControllerScript : MonoBehaviour
         {
             inAirTimer += Time.deltaTime;
         }
-        else if (groundedPlayer)
+        else
+        {
+            groundedTimer = 0.2f;
+        }
+
+        if (groundedTimer > 0)
+        {
+            groundedTimer -= Time.deltaTime;
+        }
+
+        if (groundedPlayer && playerYVelocity < 0)
         {
             playerYVelocity = 0f;
             jumpState = false;
         }
 
+        print("squatting?: " + jumpSquatState + " triggered small jump? " + triggeredSmallJump + " triggerFirstJump?: " + triggeredFirstJump + " groundedTimer > 0? " + (groundedTimer > 0));
+        triggeringFirstJump();
+        print("short jump?: " + smallJump);
+
         // Jump velocity change
-        if (smallJump && groundedPlayer)
+        if (smallJump && groundedTimer > 0)
         {
+            print("SHORT JUMP");
+            groundedTimer = 0;
             smallJump = false;
-            playerYVelocity += Mathf.Sqrt(smallJumpHeight * -1.0f * gravityValue);
+            playerYVelocity += Mathf.Sqrt(smallJumpHeight * -1.0f * -gravityValue);
         }
-        else if (longJump && groundedPlayer)
+        else if (longJump && groundedTimer > 0)
         {
+            print("LONG JUMP");
+            groundedTimer = 0;
             longJump = false;
-            playerYVelocity += Mathf.Sqrt(longJumpHeight * -1.0f * gravityValue);
+            playerYVelocity += Mathf.Sqrt(longJumpHeight * -1.0f * -gravityValue);
         }
 
+        // Gravity when either holding down or not
         if (playerYVelocity <= 0 && verticalAxis <= -0.6f)
         {
             // Fastfalling: if holding down while falling, you fall faster
-            playerYVelocity += (gravityValue - 80) * Time.deltaTime;
+            playerYVelocity -= (gravityValue + 80) * Time.deltaTime;
         }
         else
         {
-            playerYVelocity += gravityValue * Time.deltaTime;
+            playerYVelocity -= gravityValue * Time.deltaTime;
         }
 
-        Vector3 move = new Vector3(horizontalAxis, playerYVelocity, 0);
+        // Restricts momentum so that you won't reverse directions upon slowing down
+        playerXVelocity += (decelerationDirection * Time.deltaTime) * 6f;
+        if (playerXVelocity < 0 && faceRightState)
+        {
+            playerXVelocity = 0;
+        }
+        else if (playerXVelocity > 0 && !faceRightState)
+        {
+            playerXVelocity = 0;
+        }
+
+        // Handling horizontal acceleration / momentum
+        playerXVelocity += (horizontalAxis * Time.deltaTime) * 17f;
+        if(playerXVelocity > MAX_ACCELERATION && faceRightState)
+        {
+            playerXVelocity = MAX_ACCELERATION;
+        }
+        else if (playerXVelocity < -MAX_ACCELERATION && !faceRightState)
+        {
+            playerXVelocity = -MAX_ACCELERATION;
+        }
+
+        Vector3 move = new Vector3(playerXVelocity, playerYVelocity, 0);
 
         // Can move faster left and right while air borne
         if (jumpState)
         {
-            move = new Vector3(horizontalAxis * 1.5f, playerYVelocity, 0);
+            move = new Vector3(playerXVelocity * 0.9f, playerYVelocity, 0);
         }
 
-        // The one and only move function for the player
-        controller.Move(move * Time.deltaTime * playerSpeed);
+        //----------------
+        // MOVE FUNCTION |
+        //----------------
+        CollisionFlags collisionFlags = controller.Move(move * Time.deltaTime * playerSpeed);
 
         // If player facing left...
-        if (move.x != 0 && groundedPlayer && horizontalAxis < -0.2f && faceRightState)
+        if (groundedPlayer && horizontalAxis < -0.2f && faceRightState)
         {
             StartCoroutine(TurningAnimation(FACING_LEFT, 0.05f));
             faceRightState = false;
+            decelerationDirection = 1;
         }
         // If player facing right...
-        else if (move.x != 0 && groundedPlayer && horizontalAxis > 0.2f && !faceRightState)
+        else if (groundedPlayer && horizontalAxis > 0.2f && !faceRightState)
         {
             StartCoroutine(TurningAnimation(FACING_RIGHT, 0.05f));
             faceRightState = true;
+            decelerationDirection = -1;
         }
 
         if(!emitDashParticles && groundedPlayer && Mathf.Abs(horizontalAxis) > 0.8f)
@@ -133,16 +184,27 @@ public class PlayerControllerScript : MonoBehaviour
         else if (Mathf.Abs(horizontalAxis) < 0.1f)
         {
             emitDashParticles = false;
-        }
-
-        //print("horizontal axis: " + horizontalAxis);
+        }    
 
         if (!emitLandingParticles && groundedPlayer && inAirTimer > 0.01f)
         {
+            if(Mathf.Abs(horizontalAxis) < 0.15f)
+            {
+                playerXVelocity = 0;
+            }
             particleScript.EmitLandingParticles();
             emitLandingParticles = true;
             inAirTimer = 0;
         }
+
+        // If Collides with wall -> reduce xVelocity to 0
+        if((collisionFlags & (CollisionFlags.Sides)) != 0)
+        {
+            Debug.LogError("HAS HIT WALL");
+            playerXVelocity = 0;
+        }
+
+        print(" --- end of Update() this frame ----");
     }
 
     //-------------
@@ -151,17 +213,18 @@ public class PlayerControllerScript : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.performed && groundedPlayer)
+        if (context.performed && groundedTimer > 0)
         {
             Debug.LogWarning("PRESSED JUMP**");
             StartCoroutine(JumpSquatAnimation(0.06f));
         }
         if (context.canceled)
         {
-            Debug.LogWarning("RELEASED JUMP** squating? " + jumpSquatState + " | grounded? " + groundedPlayer);
+            Debug.LogWarning("RELEASED JUMP** squating? " + jumpSquatState + " | grounded? " + (groundedTimer > 0));
         }
-        if (context.canceled && !jumpSquatState && groundedPlayer)
+        if (context.canceled && jumpSquatState && groundedTimer > 0)
         {
+            Debug.LogError("**SHOULD HAVE TRIGGERED SMALL JUMP");
             triggeredSmallJump = true;
         }
     }
@@ -201,31 +264,34 @@ public class PlayerControllerScript : MonoBehaviour
             yield return null;
         }
         jumpSquatState = false;
-
-        triggeringFirstJump();
+        triggeredFirstJump = true;
     }
 
     private void triggeringFirstJump()
     {
         print("+++SQUATTING DONE++ TRIGGED SMALL JUMP?: " + triggeredSmallJump);
-        if (triggeredSmallJump)
+
+        if (triggeredSmallJump && triggeredFirstJump)
         {
+            triggeredFirstJump = false;
             longJump = false;
             jumpState = true;
             smallJump = true;
             emitLandingParticles = false;
             particleScript.EmitRunningAndJumpingParticles();
             inAirTimer = 0;
+            triggeredSmallJump = false;
         }
-        else
+        else if (!triggeredSmallJump && triggeredFirstJump)
         {
+            triggeredFirstJump = false;
             smallJump = false;
             jumpState = true;
             longJump = true;
             emitLandingParticles = false;
             particleScript.EmitRunningAndJumpingParticles();
             inAirTimer = 0;
+            triggeredSmallJump = false;
         }
-        triggeredSmallJump = false;
     }
 }
