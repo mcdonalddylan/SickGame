@@ -89,6 +89,15 @@ public partial class @SickGameControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AirDash"",
+                    ""type"": ""Button"",
+                    ""id"": ""860cd0c2-b16c-432a-9533-c2cf1c9760cd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -300,6 +309,28 @@ public partial class @SickGameControls : IInputActionCollection2, IDisposable
                     ""action"": ""VerticalMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e15e3e9d-09bb-46a3-82fd-838df94adbe0"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""AirDash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bcbb2d7c-b47b-439a-88e7-1eba3f787802"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""AirDash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -338,6 +369,7 @@ public partial class @SickGameControls : IInputActionCollection2, IDisposable
         m_Player1_SpecialAttack = m_Player1.FindAction("SpecialAttack", throwIfNotFound: true);
         m_Player1_TimeControl = m_Player1.FindAction("TimeControl", throwIfNotFound: true);
         m_Player1_Pause = m_Player1.FindAction("Pause", throwIfNotFound: true);
+        m_Player1_AirDash = m_Player1.FindAction("AirDash", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -404,6 +436,7 @@ public partial class @SickGameControls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player1_SpecialAttack;
     private readonly InputAction m_Player1_TimeControl;
     private readonly InputAction m_Player1_Pause;
+    private readonly InputAction m_Player1_AirDash;
     public struct Player1Actions
     {
         private @SickGameControls m_Wrapper;
@@ -415,6 +448,7 @@ public partial class @SickGameControls : IInputActionCollection2, IDisposable
         public InputAction @SpecialAttack => m_Wrapper.m_Player1_SpecialAttack;
         public InputAction @TimeControl => m_Wrapper.m_Player1_TimeControl;
         public InputAction @Pause => m_Wrapper.m_Player1_Pause;
+        public InputAction @AirDash => m_Wrapper.m_Player1_AirDash;
         public InputActionMap Get() { return m_Wrapper.m_Player1; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -445,6 +479,9 @@ public partial class @SickGameControls : IInputActionCollection2, IDisposable
                 @Pause.started -= m_Wrapper.m_Player1ActionsCallbackInterface.OnPause;
                 @Pause.performed -= m_Wrapper.m_Player1ActionsCallbackInterface.OnPause;
                 @Pause.canceled -= m_Wrapper.m_Player1ActionsCallbackInterface.OnPause;
+                @AirDash.started -= m_Wrapper.m_Player1ActionsCallbackInterface.OnAirDash;
+                @AirDash.performed -= m_Wrapper.m_Player1ActionsCallbackInterface.OnAirDash;
+                @AirDash.canceled -= m_Wrapper.m_Player1ActionsCallbackInterface.OnAirDash;
             }
             m_Wrapper.m_Player1ActionsCallbackInterface = instance;
             if (instance != null)
@@ -470,6 +507,9 @@ public partial class @SickGameControls : IInputActionCollection2, IDisposable
                 @Pause.started += instance.OnPause;
                 @Pause.performed += instance.OnPause;
                 @Pause.canceled += instance.OnPause;
+                @AirDash.started += instance.OnAirDash;
+                @AirDash.performed += instance.OnAirDash;
+                @AirDash.canceled += instance.OnAirDash;
             }
         }
     }
@@ -501,5 +541,6 @@ public partial class @SickGameControls : IInputActionCollection2, IDisposable
         void OnSpecialAttack(InputAction.CallbackContext context);
         void OnTimeControl(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
+        void OnAirDash(InputAction.CallbackContext context);
     }
 }

@@ -45,8 +45,8 @@ public class GemScript : MonoBehaviour
         {
             collider.enabled = false;
             GameManager.gemsCount += 1;
-            CameraFollowScript camScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollowScript>();
-            camScript.ShakeCamera(0.2f);
+            //CameraFollowScript camScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollowScript>();
+            //camScript.ShakeCamera(0.00001f);
             GameUIScript gameUI = GameObject.FindGameObjectWithTag("InGameUI").GetComponent<GameUIScript>();
             gameUI.UpdateGemsCountOnUI();
 

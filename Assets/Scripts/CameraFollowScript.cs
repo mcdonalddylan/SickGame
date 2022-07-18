@@ -57,20 +57,20 @@ public class CameraFollowScript : MonoBehaviour
     {
         Vector3 originalTransform = transform.position;
         transform.position = new Vector3(
-            transform.position.x + (Random.Range(-3, 3) * intensity),
-            transform.position.y + (Random.Range(-3, 3) * intensity),
-            transform.position.z);
-        yield return new WaitForSeconds(0.02f);
-        transform.position = new Vector3(
-            transform.position.x + (Random.Range(-2, 2) * intensity),
-            transform.position.y + (Random.Range(-2, 2) * intensity),
-            transform.position.z);
-        yield return new WaitForSeconds(0.02f);
-        transform.position = new Vector3(
             transform.position.x + (Random.Range(-1, 1) * intensity),
             transform.position.y + (Random.Range(-1, 1) * intensity),
             transform.position.z);
-        yield return new WaitForSeconds(0.02f);
+        yield return new WaitForSeconds(0.01f);
+        transform.position = new Vector3(
+            transform.position.x + (Random.Range(-0.5f, 0.5f) * intensity),
+            transform.position.y + (Random.Range(-0.5f, 0.5f) * intensity),
+            transform.position.z);
+        yield return new WaitForSeconds(0.01f);
+        transform.position = new Vector3(
+            transform.position.x + (Random.Range(-0.1f, 0.1f) * intensity),
+            transform.position.y + (Random.Range(-0.1f, 0.1f) * intensity),
+            transform.position.z);
+        yield return new WaitForSeconds(0.01f);
         transform.position = originalTransform;
     }
 }

@@ -25,15 +25,19 @@ public class PlayerControllerScript : MonoBehaviour
     private bool groundedPlayer;
     private float groundedTimer; // needed to allow player to jump while going down ramp
     private bool smallJump;
+    private bool airDash;
     private bool triggeredFirstJump;
     private bool triggeredSmallJump;
     private bool longJump;
     private float horizontalAxis;
+    private int horizontalDirection;
     private float verticalAxis;
+    private int verticalDirection;
 
     // Player state variables
     public static int damage = 0;
     public bool faceRightState = true;
+    private static bool airDashState;
     public static bool hitLagState;
     public static bool hitStunState;
     public static bool walkState;
@@ -93,33 +97,40 @@ public class PlayerControllerScript : MonoBehaviour
         {
             playerYVelocity = 0f;
             jumpState = false;
+            airDashState = false;
         }
 
-        print("squatting?: " + jumpSquatState + " triggered small jump? " + triggeredSmallJump + " triggerFirstJump?: " + triggeredFirstJump + " groundedTimer > 0? " + (groundedTimer > 0));
         triggeringFirstJump();
-        print("short jump?: " + smallJump);
 
         // Jump velocity change
         if (smallJump && groundedTimer > 0)
         {
-            print("SHORT JUMP");
             groundedTimer = 0;
             smallJump = false;
             playerYVelocity += Mathf.Sqrt(smallJumpHeight * -1.0f * -gravityValue);
         }
         else if (longJump && groundedTimer > 0)
         {
-            print("LONG JUMP");
             groundedTimer = 0;
             longJump = false;
             playerYVelocity += Mathf.Sqrt(longJumpHeight * -1.0f * -gravityValue);
+        }
+
+        // Air dash velocity change
+        if (airDash)
+        {
+            particleScript.EmitDashTrail();
+            airDash = false;
+            playerYVelocity += 2f * verticalDirection;
+            playerXVelocity += 3f * horizontalDirection;
+            airDashState = true;
         }
 
         // Gravity when either holding down or not
         if (playerYVelocity <= 0 && verticalAxis <= -0.6f)
         {
             // Fastfalling: if holding down while falling, you fall faster
-            playerYVelocity -= (gravityValue + 80) * Time.deltaTime;
+            playerYVelocity -= (gravityValue + 30) * Time.deltaTime;
         }
         else
         {
@@ -127,18 +138,33 @@ public class PlayerControllerScript : MonoBehaviour
         }
 
         // Restricts momentum so that you won't reverse directions upon slowing down
-        playerXVelocity += (decelerationDirection * Time.deltaTime) * 6f;
-        if (playerXVelocity < 0 && faceRightState)
+        if(jumpState && faceRightState && horizontalAxis <= 0)
         {
-            playerXVelocity = 0;
+            playerXVelocity += (horizontalAxis * Time.deltaTime) * 4.5f;
         }
-        else if (playerXVelocity > 0 && !faceRightState)
+        else if (jumpState && !faceRightState && horizontalAxis >= 0)
         {
-            playerXVelocity = 0;
+            playerXVelocity += (horizontalAxis * Time.deltaTime) * 4.5f;
+        }
+        else if (airDashState)
+        {
+            Debug.LogError("SHOULD NOT BE DECLERATING");
+        }
+        else
+        {
+            playerXVelocity += (decelerationDirection * Time.deltaTime) * 6f;
+            if (playerXVelocity < 0 && faceRightState)
+            {
+                playerXVelocity = 0;
+            }
+            else if (playerXVelocity > 0 && !faceRightState)
+            {
+                playerXVelocity = 0;
+            }
+            playerXVelocity += (horizontalAxis * Time.deltaTime) * 17f;
         }
 
         // Handling horizontal acceleration / momentum
-        playerXVelocity += (horizontalAxis * Time.deltaTime) * 17f;
         if(playerXVelocity > MAX_ACCELERATION && faceRightState)
         {
             playerXVelocity = MAX_ACCELERATION;
@@ -146,6 +172,10 @@ public class PlayerControllerScript : MonoBehaviour
         else if (playerXVelocity < -MAX_ACCELERATION && !faceRightState)
         {
             playerXVelocity = -MAX_ACCELERATION;
+        }
+        else if (airDashState)
+        {
+            Debug.LogError("No Acceleration limit while air dashing");
         }
 
         Vector3 move = new Vector3(playerXVelocity, playerYVelocity, 0);
@@ -162,21 +192,21 @@ public class PlayerControllerScript : MonoBehaviour
         CollisionFlags collisionFlags = controller.Move(move * Time.deltaTime * playerSpeed);
 
         // If player facing left...
-        if (groundedPlayer && horizontalAxis < -0.2f && faceRightState)
+        if (groundedPlayer && !jumpSquatState && horizontalAxis < -0.2f && faceRightState)
         {
             StartCoroutine(TurningAnimation(FACING_LEFT, 0.05f));
             faceRightState = false;
             decelerationDirection = 1;
         }
         // If player facing right...
-        else if (groundedPlayer && horizontalAxis > 0.2f && !faceRightState)
+        else if (groundedPlayer && !jumpSquatState && horizontalAxis > 0.2f && !faceRightState)
         {
             StartCoroutine(TurningAnimation(FACING_RIGHT, 0.05f));
             faceRightState = true;
             decelerationDirection = -1;
         }
 
-        if(!emitDashParticles && groundedPlayer && Mathf.Abs(horizontalAxis) > 0.8f)
+        if(!emitDashParticles && groundedPlayer && Mathf.Abs(horizontalAxis) > 0.9f)
         {
             emitDashParticles = true;
             particleScript.EmitRunningAndJumpingParticles();
@@ -200,11 +230,18 @@ public class PlayerControllerScript : MonoBehaviour
         // If Collides with wall -> reduce xVelocity to 0
         if((collisionFlags & (CollisionFlags.Sides)) != 0)
         {
-            Debug.LogError("HAS HIT WALL");
+            //Debug.LogError("HAS HIT WALL");
             playerXVelocity = 0;
         }
 
-        print(" --- end of Update() this frame ----");
+        // If Collides with ceiling -> reduce yVelocity to 0
+        if ((collisionFlags & (CollisionFlags.Above)) != 0)
+        {
+            //Debug.LogError("HAS HIT CEILING");
+            playerYVelocity -= gravityValue * Time.deltaTime;
+        }
+
+        //print(" --- end of Update() this frame ----");
     }
 
     //-------------
@@ -215,16 +252,11 @@ public class PlayerControllerScript : MonoBehaviour
     {
         if (context.performed && groundedTimer > 0)
         {
-            Debug.LogWarning("PRESSED JUMP**");
-            StartCoroutine(JumpSquatAnimation(0.06f));
-        }
-        if (context.canceled)
-        {
-            Debug.LogWarning("RELEASED JUMP** squating? " + jumpSquatState + " | grounded? " + (groundedTimer > 0));
+            //Debug.LogWarning("PRESSED JUMP**");
+            StartCoroutine(JumpSquatAnimation(0.07f));
         }
         if (context.canceled && jumpSquatState && groundedTimer > 0)
         {
-            Debug.LogError("**SHOULD HAVE TRIGGERED SMALL JUMP");
             triggeredSmallJump = true;
         }
     }
@@ -232,12 +264,46 @@ public class PlayerControllerScript : MonoBehaviour
     public void HorizontalAxis(InputAction.CallbackContext context)
     {
         horizontalAxis = context.ReadValue<float>();
+        if (horizontalAxis > 0)
+        {
+            horizontalDirection = 1;
+        }
+        else if (horizontalAxis < 0)
+        {
+            horizontalDirection = -1;
+        }
+        else
+        {
+            horizontalDirection = 0;
+        }
     }
 
     public void VerticalAxis(InputAction.CallbackContext context)
     {
         verticalAxis = context.ReadValue<float>();
+        if (verticalAxis > 0)
+        {
+            verticalDirection = 1;
+        }
+        else if (verticalAxis < 0)
+        {
+            verticalDirection = -1;
+        }
+        else
+        {
+            verticalDirection = 0;
+        }
     }
+
+    public void AirDash(InputAction.CallbackContext context)
+    {
+        if (context.performed && jumpState)
+        {
+            Debug.LogWarning("PRESSED AIR DASH");
+            airDash = true;
+        }
+    }
+
 
     //-----------------
     // STATE COROUTINES
@@ -269,8 +335,6 @@ public class PlayerControllerScript : MonoBehaviour
 
     private void triggeringFirstJump()
     {
-        print("+++SQUATTING DONE++ TRIGGED SMALL JUMP?: " + triggeredSmallJump);
-
         if (triggeredSmallJump && triggeredFirstJump)
         {
             triggeredFirstJump = false;
