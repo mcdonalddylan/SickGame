@@ -12,6 +12,7 @@ public class PlayerControllerScript : MonoBehaviour
 
     private float playerSpeed = 10.0f;
     private float smallJumpHeight = 0.3f;
+    private float doubleJumpHeight = 0.5f;
     private float longJumpHeight = 0.8f;
     private float gravityValue = 12.5f;
 
@@ -29,6 +30,7 @@ public class PlayerControllerScript : MonoBehaviour
     private bool triggeredFirstJump;
     private bool triggeredSmallJump;
     private bool longJump;
+    private bool doubleJump;
     private float horizontalAxis;
     private int horizontalDirection;
     private float verticalAxis;
@@ -97,6 +99,7 @@ public class PlayerControllerScript : MonoBehaviour
         {
             playerYVelocity = 0f;
             jumpState = false;
+            doubleJumpState = false;
             airDashState = false;
         }
 
@@ -114,6 +117,16 @@ public class PlayerControllerScript : MonoBehaviour
             groundedTimer = 0;
             longJump = false;
             playerYVelocity += Mathf.Sqrt(longJumpHeight * -1.0f * -gravityValue);
+        }
+
+        // Double jump
+        if (jumpState && doubleJump)
+        {
+            groundedTimer = 0;
+            doubleJump = false;
+            doubleJumpState = true;
+            particleScript.EmitDoubleJumpParticles();
+            playerYVelocity += Mathf.Sqrt(doubleJumpHeight * -1.0f * -gravityValue);
         }
 
         // Air dash velocity change
@@ -250,10 +263,15 @@ public class PlayerControllerScript : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.performed && groundedTimer > 0)
+        if (context.performed && groundedTimer > 0 && !jumpState)
         {
             //Debug.LogWarning("PRESSED JUMP**");
             StartCoroutine(JumpSquatAnimation(0.07f));
+        }
+        if (context.performed && jumpState && !doubleJumpState)
+        {
+            //Debug.LogWarning("PRESSED JUMP**");
+            doubleJump = true;
         }
         if (context.canceled && jumpSquatState && groundedTimer > 0)
         {

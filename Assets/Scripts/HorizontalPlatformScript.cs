@@ -34,13 +34,27 @@ public class HorizontalPlatformScript : MonoBehaviour
         //movementDelta = transform.position - movementDelta;
     }
 
-    private void OnTriggerStay(Collider collision)
+    private void OnTriggerEnter(Collider collision)
     {
-        //print("who entered collision: " + collision.tag);
+        print("who entered collision: " + collision.tag);
         if (collision.tag.Equals("Player"))
         {
             print("player entered collision");
-            collision.gameObject.transform.position = transform.position + movementDelta;
+            //collision.gameObject.transform.position = transform.position + movementDelta;
+            //collision.gameObject.transform.position = transform.position;
+            //collision.gameObject.transform.SetParent(transform, true);
+        }
+    }
+
+    private void OnTriggerExit(Collider collision)
+    {
+        print("who entered collision: " + collision.tag);
+        if (collision.tag.Equals("Player"))
+        {
+            print("player exited collision");
+            //collision.gameObject.transform.position = transform.position + movementDelta;
+            //collision.gameObject.transform.position = transform.position;
+            //collision.gameObject.transform.SetParent(null);
         }
     }
 }

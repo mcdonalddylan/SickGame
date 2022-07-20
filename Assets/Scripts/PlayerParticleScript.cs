@@ -8,6 +8,7 @@ public class PlayerParticleScript : MonoBehaviour
     public GameObject particlesGroup;
     private ParticleSystem runAndJumpParticles;
     private ParticleSystem landingParticles;
+    private ParticleSystem doubleJumpParticles;
     private TrailRenderer dashTrail;
 
     // Materials while on different group
@@ -19,6 +20,7 @@ public class PlayerParticleScript : MonoBehaviour
     {
         runAndJumpParticles = particlesGroup.GetComponentsInChildren<ParticleSystem>()[0];
         landingParticles = particlesGroup.GetComponentsInChildren<ParticleSystem>()[1];
+        doubleJumpParticles = particlesGroup.GetComponentsInChildren<ParticleSystem>()[2];
         dashTrail = particlesGroup.GetComponentInChildren<TrailRenderer>();
         dashTrail.emitting = false;
     }
@@ -37,6 +39,11 @@ public class PlayerParticleScript : MonoBehaviour
         landingParticles.GetComponent<ParticleSystemRenderer>().material = grassMaterial;
 
         landingParticles.Play();
+    }
+
+    public void EmitDoubleJumpParticles()
+    {
+        doubleJumpParticles.Play();
     }
 
     public void EmitDashTrail()
