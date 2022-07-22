@@ -1,8 +1,10 @@
 using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering;
 
 public class GameUIScript : MonoBehaviour
 {
@@ -15,6 +17,12 @@ public class GameUIScript : MonoBehaviour
     public GameObject gemsUIGroup;
     public GameObject spiritsUIGroup;
 
+    public Color32 TIME_CONTROLER_BAR_COLOR = new Color32(231, 177, 255, 255);
+    private Coroutine timeBarAnimation = null;
+    public GameObject player1FrontTimeControlBar;
+
+    private Volume postprocessingVolume;
+
     private void Awake()
     {
         // Set lives, gems and spirits based on save data
@@ -24,6 +32,17 @@ public class GameUIScript : MonoBehaviour
         gemsText.text = "x " + GameManager.gemsCount;
         Text spiritsText = spiritsUIGroup.GetComponentsInChildren<Text>()[0];
         spiritsText.text = "x " + GameManager.spiritCount;
+
+        try
+        {
+            postprocessingVolume = GameObject.FindGameObjectWithTag("GlobalVolume").GetComponent<Volume>();
+        }
+        catch (NullReferenceException e)
+        {
+            Debug.Log("No global volume found in this scene");
+        }
+
+        player1FrontTimeControlBar.GetComponent<Image>().color = TIME_CONTROLER_BAR_COLOR;
     }
 
     private void Start()
@@ -188,6 +207,13 @@ public class GameUIScript : MonoBehaviour
         Time.timeScale = 1;
         AudioListener.pause = false;
         GameManager.isPaused = false;
+        GameManager.timeScale = 1.0f;
+        GameManager.isTimeSlow = false;
+        ColorAdjustments colorAdjustments;
+        postprocessingVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments);
+        colorAdjustments.saturation.value = 0;
+
+
 
         GameManager.LoadScene(1, 0.3f);
     }
@@ -211,6 +237,17 @@ public class GameUIScript : MonoBehaviour
         Text spiritsText = spiritsUIGroup.GetComponentsInChildren<Text>()[0];
         StartCoroutine(UIJumpAnimation(spiritsUIGroup, 0.1f));
         spiritsText.text = "x " + GameManager.spiritCount;
+    }
+
+    public void SlowTimeBarAnimation(int playerNumber)
+    {
+        timeBarAnimation = StartCoroutine(PlayerTimeControlUISlow(0.5f, playerNumber));
+    }
+
+    public void ReturnNormalTimeBar(int playerNumber)
+    {
+        StopCoroutine(timeBarAnimation);
+        player1FrontTimeControlBar.GetComponent<Image>().color = TIME_CONTROLER_BAR_COLOR;
     }
 
     public void FadeInTopUI()
@@ -247,6 +284,31 @@ public class GameUIScript : MonoBehaviour
             yield return null;
         }
         uiRectTransform.anchoredPosition = new Vector2(uiRectTransform.anchoredPosition.x, originalYPos);
+    }
+
+    private IEnumerator PlayerTimeControlUISlow(float duration, int playerNumber)
+    {
+        Image timeBarImage = null;
+        if (playerNumber == 1)
+        {
+            timeBarImage = player1FrontTimeControlBar.GetComponent<Image>();
+        }
+        while (true){
+            for (float i = 0; i < 1; i += Time.deltaTime / duration)
+            {
+                timeBarImage.color = Color.Lerp(TIME_CONTROLER_BAR_COLOR, Color.white, i);
+                yield return null;
+            }
+            timeBarImage.color = Color.white;
+
+            for (float i = 0; i < 1; i += Time.deltaTime / duration)
+            {
+                timeBarImage.color = Color.Lerp(Color.white, TIME_CONTROLER_BAR_COLOR, i);
+                yield return null;
+            }
+            timeBarImage.color = TIME_CONTROLER_BAR_COLOR;
+        }
+        
     }
 
     private IEnumerator UIFadeIn(CanvasGroup canvasGroup, float duration)

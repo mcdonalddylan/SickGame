@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 
     // Game state variables
     public static float timeScale = 1.0f;
+    public static bool isTimeSlow = false;
     public static bool particleEffectsEnabled = false;
     public static bool isPaused = false;
     public static string playerLocation = "mainForest";

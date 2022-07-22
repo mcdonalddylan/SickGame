@@ -34,7 +34,9 @@ public class CameraFollowScript : MonoBehaviour
                 offset = FACE_LEFT_OFFSET;
             }
             // If the player's speed is greater than 1, increase the smooth speed to the normal amount
-            if (Mathf.Abs(playerTarget.gameObject.GetComponent<PlayerControllerScript>().playerXVelocity) >= 1)
+            if (Mathf.Abs(playerTarget.gameObject.GetComponent<PlayerControllerScript>().playerXVelocity) >= 1 ||
+                playerTarget.gameObject.GetComponent<PlayerControllerScript>().playerYVelocity > 1 ||
+                playerTarget.gameObject.GetComponent<PlayerControllerScript>().playerYVelocity < -1.1f)
             {
                 smoothSpeedFactor = 0.125f;
             }

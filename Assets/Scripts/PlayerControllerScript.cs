@@ -12,12 +12,15 @@ public class PlayerControllerScript : MonoBehaviour
 
     private float playerSpeed = 10.0f;
     private float smallJumpHeight = 0.3f;
-    private float doubleJumpHeight = 0.5f;
+    private float doubleJumpHeight = 0.7f;
     private float longJumpHeight = 0.8f;
     private float gravityValue = 12.5f;
 
+    public int playerNumber = 1;
+    public bool timeHalted = false;
     private CharacterController controller;
     private PlayerParticleScript particleScript;
+    private TimeControlScript timeControlScript;
     public float playerYVelocity;
     public float playerXVelocity;
     private float decelerationDirection = -1;
@@ -34,23 +37,25 @@ public class PlayerControllerScript : MonoBehaviour
     private float horizontalAxis;
     private int horizontalDirection;
     private float verticalAxis;
-    private int verticalDirection;
+    private float verticalDirection;
 
     // Player state variables
-    public static int damage = 0;
+    public int damage = 0;
+    public float currentTimeSlowValue = 1;
     public bool faceRightState = true;
-    private static bool airDashState;
-    public static bool hitLagState;
-    public static bool hitStunState;
-    public static bool walkState;
-    public static bool runningState;
-    public static bool sprintState;
-    public static bool crouchState;
-    public static bool jumpSquatState;
-    public static bool jumpState;
-    public static bool doubleJumpState;
-    public static bool turningAroundState = false;
-    public static bool attackState;
+    public bool turningAroundState;
+    private bool airDashState;
+    private bool hitLagState;
+    private bool hitStunState;
+    private bool walkState;
+    private bool runningState;
+    private bool sprintState;
+    private bool crouchState;
+    private bool jumpSquatState;
+    private bool jumpState;
+    private bool doubleJumpState;
+    private bool fallState;
+    public bool attackState;
 
     private bool emitLandingParticles = false;
     private bool emitDashParticles = false;
@@ -59,6 +64,7 @@ public class PlayerControllerScript : MonoBehaviour
     {
         controller = gameObject.GetComponent<CharacterController>();
         particleScript = gameObject.GetComponent<PlayerParticleScript>();
+        timeControlScript = gameObject.GetComponent<TimeControlScript>();
         FindCheckpointAndSpawn();
     }
 
@@ -103,6 +109,15 @@ public class PlayerControllerScript : MonoBehaviour
             airDashState = false;
         }
 
+        if (!jumpState && !doubleJumpState && !(groundedTimer > 0) && playerYVelocity < -0.01f)
+        {
+            fallState = true;
+        }
+        else
+        {
+            fallState = false;
+        }
+
         triggeringFirstJump();
 
         // Jump velocity change
@@ -120,7 +135,7 @@ public class PlayerControllerScript : MonoBehaviour
         }
 
         // Double jump
-        if (jumpState && doubleJump)
+        if ((jumpState || fallState) && doubleJump)
         {
             groundedTimer = 0;
             doubleJump = false;
@@ -134,8 +149,8 @@ public class PlayerControllerScript : MonoBehaviour
         {
             particleScript.EmitDashTrail();
             airDash = false;
-            playerYVelocity += 2f * verticalDirection;
-            playerXVelocity += 3f * horizontalDirection;
+            playerYVelocity += 3.5f * verticalDirection;
+            playerXVelocity += 2.5f * horizontalDirection;
             airDashState = true;
         }
 
@@ -161,7 +176,7 @@ public class PlayerControllerScript : MonoBehaviour
         }
         else if (airDashState)
         {
-            Debug.LogError("SHOULD NOT BE DECLERATING");
+            //Debug.LogError("SHOULD NOT BE DECLERATING");
         }
         else
         {
@@ -188,7 +203,7 @@ public class PlayerControllerScript : MonoBehaviour
         }
         else if (airDashState)
         {
-            Debug.LogError("No Acceleration limit while air dashing");
+            //Debug.LogError("No Acceleration limit while air dashing");
         }
 
         Vector3 move = new Vector3(playerXVelocity, playerYVelocity, 0);
@@ -254,6 +269,7 @@ public class PlayerControllerScript : MonoBehaviour
             playerYVelocity -= gravityValue * Time.deltaTime;
         }
 
+        print("fallState : " + fallState);
         //print(" --- end of Update() this frame ----");
     }
 
@@ -263,17 +279,18 @@ public class PlayerControllerScript : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.performed && groundedTimer > 0 && !jumpState)
+        if (context.performed && groundedTimer > 0 && !jumpState && !fallState && !doubleJump)
         {
             //Debug.LogWarning("PRESSED JUMP**");
             StartCoroutine(JumpSquatAnimation(0.07f));
         }
-        if (context.performed && jumpState && !doubleJumpState)
+        else if (context.performed && !doubleJumpState)
         {
             //Debug.LogWarning("PRESSED JUMP**");
+            playerYVelocity = 0;
             doubleJump = true;
         }
-        if (context.canceled && jumpSquatState && groundedTimer > 0)
+        if (context.canceled && jumpSquatState && !doubleJumpState && groundedTimer > 0)
         {
             triggeredSmallJump = true;
         }
@@ -299,17 +316,17 @@ public class PlayerControllerScript : MonoBehaviour
     public void VerticalAxis(InputAction.CallbackContext context)
     {
         verticalAxis = context.ReadValue<float>();
-        if (verticalAxis > 0)
+        if (verticalAxis >= 0.15f)
         {
             verticalDirection = 1;
         }
-        else if (verticalAxis < 0)
+        else if (verticalAxis <= -0.25f)
         {
-            verticalDirection = -1;
+            verticalDirection = -0.3f;
         }
         else
         {
-            verticalDirection = 0;
+            verticalDirection = 0.35f;
         }
     }
 
@@ -317,8 +334,21 @@ public class PlayerControllerScript : MonoBehaviour
     {
         if (context.performed && jumpState)
         {
-            Debug.LogWarning("PRESSED AIR DASH");
+            //Debug.LogWarning("PRESSED AIR DASH");
+            playerYVelocity = 0;
             airDash = true;
+        }
+    }
+
+    public void TimeControl(InputAction.CallbackContext context)
+    {
+        if (context.performed && !GameManager.isTimeSlow && !timeHalted && currentTimeSlowValue > 0.05f)
+        {
+            timeControlScript.StartTimeSlow(0.35f, playerNumber);
+        }
+        else if (context.performed && GameManager.isTimeSlow)
+        {
+            timeControlScript.ReturnNormalTime(0.35f, playerNumber);
         }
     }
 

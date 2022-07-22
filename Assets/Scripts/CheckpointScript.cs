@@ -48,7 +48,7 @@ public class CheckpointScript : MonoBehaviour
     private IEnumerator FadeInLight(float duration)
     {
         checkpointLight.gameObject.SetActive(true);
-        for (float i = 0; i < 1; i += Time.deltaTime / duration)
+        for (float i = 0; i < 1; i += (Time.deltaTime / duration) * GameManager.timeScale)
         {
             checkpointLight.intensity = Mathf.Lerp(0, 1, i);
             yield return null;

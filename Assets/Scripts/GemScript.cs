@@ -23,14 +23,14 @@ public class GemScript : MonoBehaviour
         Vector3 adjustedPos = new Vector3(originalPos.x, originalPos.y + 0.4f, originalPos.z);
         while (true)
         {
-            for(float i = 0; i < 1; i += Time.deltaTime / duration)
+            for(float i = 0; i < 1; i += (Time.deltaTime / duration) * GameManager.timeScale)
             {
                 gameObject.transform.position = Vector3.Lerp(originalPos, adjustedPos, Mathf.SmoothStep(0.0f, 1.0f, i));
                 yield return null;
             }
             gameObject.transform.position = adjustedPos;
 
-            for (float i = 0; i < 1; i += Time.deltaTime / duration)
+            for (float i = 0; i < 1; i += (Time.deltaTime / duration) * GameManager.timeScale)
             {
                 gameObject.transform.position = Vector3.Lerp(adjustedPos, originalPos, Mathf.SmoothStep(0.0f, 1.0f, i));
                 yield return null;
