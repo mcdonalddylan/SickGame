@@ -4,23 +4,31 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-public class PlayerControllerScript : MonoBehaviour
+[RequireComponent(typeof(RaycastControllerScript))]
+public class PlayerControllerScript : RaycastControllerScript
 {
+    // Constants
     private Vector3 FACING_LEFT = new Vector3(0, 180, 0);
     private Vector3 FACING_RIGHT = Vector3.zero;
-    private float MAX_ACCELERATION = 2f;
+    const float MAX_ACCELERATION = 2f;
+    private float MAX_CLIMB_ANGLE = 50;
+    private float MAX_DESCEND_ANGLE = 45;
 
+    // Player attribute variables
     private float playerSpeed = 10.0f;
     private float smallJumpHeight = 0.3f;
-    private float doubleJumpHeight = 0.7f;
+    private float doubleJumpHeight = 0.75f;
     private float longJumpHeight = 0.8f;
-    private float gravityValue = 12.5f;
+    private float gravityValue = 12f;
 
-    public int playerNumber = 1;
-    public bool timeHalted = false;
+    // Player scripts
     private CharacterController controller;
     private PlayerParticleScript particleScript;
     private TimeControlScript timeControlScript;
+
+    // Core player variables
+    public int playerNumber = 1;
+    public bool timeHalted = false;
     public float playerYVelocity;
     public float playerXVelocity;
     private float decelerationDirection = -1;
@@ -57,15 +65,18 @@ public class PlayerControllerScript : MonoBehaviour
     private bool fallState;
     public bool attackState;
 
+    // Particle booleans
     private bool emitLandingParticles = false;
     private bool emitDashParticles = false;
 
-    private void Start()
+    public override void Start()
     {
+        base.Start();
         controller = gameObject.GetComponent<CharacterController>();
         particleScript = gameObject.GetComponent<PlayerParticleScript>();
         timeControlScript = gameObject.GetComponent<TimeControlScript>();
         FindCheckpointAndSpawn();
+        CalculateRaySpacing();
     }
 
     private void FindCheckpointAndSpawn()
@@ -81,19 +92,19 @@ public class PlayerControllerScript : MonoBehaviour
             }
         }
         gameObject.transform.localPosition = checkpoint.transform.position;
-        Physics.SyncTransforms();  // needed to avoid a bug where the player doesn't spawn every time you load the level
+        //Physics.SyncTransforms();  // needed to avoid a bug where the player doesn't spawn every time you load the level
     }
 
     void Update()
     {
-        groundedPlayer = controller.isGrounded;
+        groundedPlayer = collisions.below;
         if (!groundedPlayer)
         {
             inAirTimer += Time.deltaTime;
         }
         else
         {
-            groundedTimer = 0.2f;
+            groundedTimer = 0.15f;
         }
 
         if (groundedTimer > 0)
@@ -158,7 +169,7 @@ public class PlayerControllerScript : MonoBehaviour
         if (playerYVelocity <= 0 && verticalAxis <= -0.6f)
         {
             // Fastfalling: if holding down while falling, you fall faster
-            playerYVelocity -= (gravityValue + 30) * Time.deltaTime;
+            playerYVelocity -= (gravityValue + 40) * Time.deltaTime;
         }
         else
         {
@@ -166,17 +177,13 @@ public class PlayerControllerScript : MonoBehaviour
         }
 
         // Restricts momentum so that you won't reverse directions upon slowing down
-        if(jumpState && faceRightState && horizontalAxis <= 0)
+        if (jumpState && !airDashState && faceRightState && horizontalAxis <= 0)
         {
             playerXVelocity += (horizontalAxis * Time.deltaTime) * 4.5f;
         }
-        else if (jumpState && !faceRightState && horizontalAxis >= 0)
+        else if (jumpState && !airDashState && !faceRightState && horizontalAxis >= 0)
         {
             playerXVelocity += (horizontalAxis * Time.deltaTime) * 4.5f;
-        }
-        else if (airDashState)
-        {
-            //Debug.LogError("SHOULD NOT BE DECLERATING");
         }
         else
         {
@@ -193,7 +200,7 @@ public class PlayerControllerScript : MonoBehaviour
         }
 
         // Handling horizontal acceleration / momentum
-        if(playerXVelocity > MAX_ACCELERATION && faceRightState)
+        if (playerXVelocity > MAX_ACCELERATION && faceRightState)
         {
             playerXVelocity = MAX_ACCELERATION;
         }
@@ -217,7 +224,7 @@ public class PlayerControllerScript : MonoBehaviour
         //----------------
         // MOVE FUNCTION |
         //----------------
-        CollisionFlags collisionFlags = controller.Move(move * Time.deltaTime * playerSpeed);
+        Move(move * Time.deltaTime * playerSpeed);
 
         // If player facing left...
         if (groundedPlayer && !jumpSquatState && horizontalAxis < -0.2f && faceRightState)
@@ -256,21 +263,203 @@ public class PlayerControllerScript : MonoBehaviour
         }
 
         // If Collides with wall -> reduce xVelocity to 0
-        if((collisionFlags & (CollisionFlags.Sides)) != 0)
-        {
-            //Debug.LogError("HAS HIT WALL");
-            playerXVelocity = 0;
-        }
+        //if((collisionFlags & (CollisionFlags.Sides)) != 0)
+        //{
+        //Debug.LogError("HAS HIT WALL");
+        //playerXVelocity = 0;
+        //}
 
         // If Collides with ceiling -> reduce yVelocity to 0
-        if ((collisionFlags & (CollisionFlags.Above)) != 0)
+        //if ((collisionFlags & (CollisionFlags.Above)) != 0)
+        //{
+        //Debug.LogError("HAS HIT CEILING");
+        //playerYVelocity -= gravityValue * Time.deltaTime;
+        //}
+
+        // If Collides with ceiling -> reduce yVelocity to 0
+        if (collisions.above)
         {
-            //Debug.LogError("HAS HIT CEILING");
+            Debug.LogError("HAS HIT CEILING");
             playerYVelocity -= gravityValue * Time.deltaTime;
         }
 
-        print("fallState : " + fallState);
+        //print("grounded player?: " + groundedPlayer);
+        print("player velocity x: " + playerXVelocity + " | y: " + playerYVelocity);
         //print(" --- end of Update() this frame ----");
+
+        timeControlScript.UpdateTimeControlUI();
+    }
+
+    public void Move(Vector3 velocity)
+    {
+        UpdateRaycastOrigins();
+        collisions.Reset();
+        collisions.velocityOld = velocity;
+
+        if(velocity.y < 0)
+        {
+            DescendSlope(ref velocity);
+        }
+        if (velocity.x != 0)
+        {
+            HorizontalCollisions(ref velocity);
+        }
+        if (velocity.y != 0)
+        {
+            VerticalCollisions(ref velocity);
+        }
+
+        //print("velocity: " + velocity);
+
+        transform.Translate(velocity, Space.World);
+    }
+
+    public void VerticalCollisions(ref Vector3 velocity)
+    {
+        float directionY = Mathf.Sign(velocity.y);
+        float rayLength = Mathf.Abs(velocity.y) + SKIN_WIDTH;
+
+        for (int i = 0; i < verticalRayCount; i++)
+        {
+            Vector2 rayOrigin = (directionY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
+            rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
+            Debug.DrawRay(rayOrigin, Vector2.up * directionY, Color.red);
+
+            if (hit)
+            {
+                velocity.y = (hit.distance - SKIN_WIDTH) * directionY;
+                rayLength = hit.distance;
+
+                if(collisions.climbingSlope)
+                {
+                    velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+                }
+
+                collisions.below = directionY == -1;
+                collisions.above = directionY == 1;
+            }
+        }
+
+        // To prevent issue getting stuck between different slopes values for a frame or two
+        if (collisions.climbingSlope)
+        {
+            float directionX = Mathf.Sign(velocity.x);
+            rayLength = Mathf.Abs(velocity.x) + SKIN_WIDTH;
+            Vector2 rayOrigin = ((directionX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight) + Vector2.up * velocity.y;
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
+            Debug.DrawRay(rayOrigin, Vector2.right * directionX, Color.red);
+
+            if (hit)
+            {
+                float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+                // If you've hit a new angle
+                if(slopeAngle != collisions.slopeAngle)
+                {
+                    velocity.x = (hit.distance - SKIN_WIDTH) * directionX;
+                    collisions.slopeAngle = slopeAngle;
+                }
+            }
+        }
+    }
+
+    public void HorizontalCollisions(ref Vector3 velocity)
+    {
+        float directionX = Mathf.Sign(velocity.x);
+        float rayLength = Mathf.Abs(velocity.x) + SKIN_WIDTH;
+
+        for (int i = 0; i < horizontalRayCount; i++)
+        {
+            Vector2 rayOrigin = (directionX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
+            rayOrigin += Vector2.up * (horizontalRaySpacing * i);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
+            Debug.DrawRay(rayOrigin, Vector2.right * directionX, Color.red);
+
+            if (hit)
+            {
+
+                float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+                // If the bottom raycast hits a slope that you can climb -> climb that slope
+                if(i == 0 && slopeAngle <= MAX_CLIMB_ANGLE)
+                {
+                    // If climbing a slope right after decending another slope, this will reset your velocity so you don't get stuck
+                    if (collisions.descendingSlope)
+                    {
+                        collisions.descendingSlope = false;
+                        velocity = collisions.velocityOld;
+                    }
+                    float distanceToSlopeStart = 0;
+                    if(slopeAngle != collisions.slopeAngleOld)
+                    {
+                        distanceToSlopeStart = hit.distance - SKIN_WIDTH;
+                        velocity.x -= distanceToSlopeStart * directionX;
+                    }
+                    ClimbSlope(ref velocity, slopeAngle);
+                    velocity.x += distanceToSlopeStart * directionX;
+                }
+
+                // If not climbing a slope, then try to detect walls
+                if(!collisions.climbingSlope || slopeAngle > MAX_CLIMB_ANGLE)
+                {
+                    velocity.x = (hit.distance - SKIN_WIDTH) * directionX;
+                    rayLength = hit.distance;
+
+                    if(collisions.climbingSlope)
+                    {
+                        velocity.y = Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+                    }
+
+                    collisions.left = directionX == -1;
+                    collisions.right = directionX == 1;
+                }
+            }
+        }
+    }
+
+    private void ClimbSlope(ref Vector3 velocity, float slopeAngle)
+    {
+        float moveDistance = Mathf.Abs(velocity.x);
+        float climbVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+        if(velocity.y <= climbVelocityY)
+        {
+            velocity.y = climbVelocityY;
+            velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+            collisions.below = true;
+            collisions.climbingSlope = true;
+            collisions.slopeAngle = slopeAngle;
+        }
+    }
+
+    private void DescendSlope(ref Vector3 velocity)
+    {
+        float directionX = Mathf.Sign(velocity.x);
+        Vector2 rayOrigin = ((directionX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight);
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, -Vector2.up, Mathf.Infinity, collisionMask);
+        Debug.DrawRay(rayOrigin, -Vector2.up, Color.red);
+
+        if (hit)
+        {
+            float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+            if(slopeAngle != 0 && slopeAngle <= MAX_DESCEND_ANGLE)
+            {
+                if(Mathf.Sign(hit.normal.x) == directionX)
+                {
+                    if(hit.distance - SKIN_WIDTH <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
+                    {
+                        float moveDistance = Mathf.Abs(velocity.x);
+                        float descendVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+
+                        velocity.y -= descendVelocityY;
+                        velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+
+                        collisions.slopeAngle = slopeAngle;
+                        collisions.descendingSlope = true;
+                        collisions.below = true;
+                    }
+                }
+            }
+        }
     }
 
     //-------------
@@ -279,18 +468,18 @@ public class PlayerControllerScript : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.performed && groundedTimer > 0 && !jumpState && !fallState && !doubleJump)
+        if (context.performed && groundedTimer > 0 && !jumpState && !fallState && !doubleJump && !doubleJumpState)
         {
-            //Debug.LogWarning("PRESSED JUMP**");
+            Debug.LogWarning("First JUMP*");
             StartCoroutine(JumpSquatAnimation(0.07f));
         }
         else if (context.performed && !doubleJumpState)
         {
-            //Debug.LogWarning("PRESSED JUMP**");
+            Debug.LogWarning("DOUBLE JUMP**");
             playerYVelocity = 0;
             doubleJump = true;
         }
-        if (context.canceled && jumpSquatState && !doubleJumpState && groundedTimer > 0)
+        if (context.canceled && jumpSquatState && !fallState && !doubleJumpState && groundedTimer > 0)
         {
             triggeredSmallJump = true;
         }

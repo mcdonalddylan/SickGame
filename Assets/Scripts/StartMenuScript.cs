@@ -108,11 +108,11 @@ public class StartMenuScript : MonoBehaviour
 
         if (optionsData.textureQuality == "Good")
         {
-            QualitySettings.masterTextureLimit = 0;
+            QualitySettings.globalTextureMipmapLimit = 0;
         }
         else if (optionsData.textureQuality == "LOL")
         {
-            QualitySettings.masterTextureLimit = 2;
+            QualitySettings.globalTextureMipmapLimit = 2;
         }
 
         if (optionsData.particleEffectsEnabled)

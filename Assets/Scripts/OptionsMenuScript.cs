@@ -15,6 +15,9 @@ public class OptionsMenuScript : MonoBehaviour
     public Toggle ssaoToggle;
     public Toggle bloomToggle;
     public Toggle fxaaToggle;
+    public Toggle colorAdjToggle;
+    public Toggle lensDistortionToggle;
+    public Toggle lensFlareToggle;
 
     // For adjusting post-processing
     public UniversalRenderPipelineAsset urpSettings;
@@ -55,6 +58,9 @@ public class OptionsMenuScript : MonoBehaviour
         ssaoToggle.onValueChanged.AddListener(delegate { ToggleSSAO(); });
         bloomToggle.onValueChanged.AddListener(delegate { ToggleBloom(); });
         fxaaToggle.onValueChanged.AddListener(delegate { ToggleFXAA(); });
+        colorAdjToggle.onValueChanged.AddListener(delegate { ToggleColorAdj(); });
+        lensDistortionToggle.onValueChanged.AddListener(delegate { ToggleLensDistortion(); });
+        lensFlareToggle.onValueChanged.AddListener(delegate { ToggleLensFlare(); });
     }
 
     private void ResolutionScaleChanged()
@@ -81,11 +87,11 @@ public class OptionsMenuScript : MonoBehaviour
     {
         if (textureDropdown.value == 0)
         {
-            QualitySettings.masterTextureLimit = 0;
+            QualitySettings.globalTextureMipmapLimit = 0;
         }
         else if (textureDropdown.value == 1)
         {
-            QualitySettings.masterTextureLimit = 2;
+            QualitySettings.globalTextureMipmapLimit = 2;
         }
     }
 
@@ -126,8 +132,7 @@ public class OptionsMenuScript : MonoBehaviour
 
     private void ToggleDof()
     {
-        DepthOfField dof;
-        postprocessingVolume.profile.TryGet<DepthOfField>(out dof);
+        postprocessingVolume.profile.TryGet<DepthOfField>(out DepthOfField dof);
         dof.active = dofToggle.isOn;
     }
 
@@ -138,8 +143,7 @@ public class OptionsMenuScript : MonoBehaviour
 
     private void ToggleBloom()
     {
-        Bloom bloom;
-        postprocessingVolume.profile.TryGet<Bloom>(out bloom);
+        postprocessingVolume.profile.TryGet<Bloom>(out Bloom bloom);
         bloom.active = bloomToggle.isOn;
     }
 
@@ -153,5 +157,23 @@ public class OptionsMenuScript : MonoBehaviour
         {
             mainCamera.GetComponent<UniversalAdditionalCameraData>().antialiasing = AntialiasingMode.None;
         }
+    }
+
+    private void ToggleColorAdj()
+    {
+        postprocessingVolume.profile.TryGet<ColorAdjustments>(out ColorAdjustments colorAdj);
+        colorAdj.active = colorAdjToggle.isOn;
+    }
+
+    private void ToggleLensDistortion()
+    {
+        postprocessingVolume.profile.TryGet<LensDistortion>(out LensDistortion lensDistortion);
+        lensDistortion.active = lensDistortionToggle.isOn;
+    }
+
+    private void ToggleLensFlare()
+    {
+        postprocessingVolume.profile.TryGet<ScreenSpaceLensFlare>(out ScreenSpaceLensFlare lensFlare);
+        lensFlare.active = lensFlareToggle.isOn;
     }
 }

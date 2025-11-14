@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GemScript : MonoBehaviour
 {
-    public SphereCollider collider;
+    public CircleCollider2D collider;
     public GameObject particleEffect;
     public Light gemPointLight;
 
@@ -14,7 +14,7 @@ public class GemScript : MonoBehaviour
         {
             gemPointLight.gameObject.SetActive(false);
         }
-        StartCoroutine(AnimateGems(0.4f));    
+        StartCoroutine(AnimateGems(0.4f));
     }
 
     private IEnumerator AnimateGems(float duration)
@@ -39,7 +39,7 @@ public class GemScript : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag.Equals("Player"))
         {

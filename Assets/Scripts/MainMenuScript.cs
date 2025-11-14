@@ -55,6 +55,12 @@ public class MainMenuScript : MonoBehaviour
         bloomToggle.isOn = optionsData.hasBloom;
         Toggle fxaaToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[5];
         fxaaToggle.isOn = optionsData.hasFXAA;
+        Toggle colorAdjToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[6];
+        colorAdjToggle.isOn = optionsData.hasColorAdjustments;
+        Toggle lensDistToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[7];
+        lensDistToggle.isOn = optionsData.hasLensDistortion;
+        Toggle lensFlareToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[8];
+        lensFlareToggle.isOn = optionsData.hasScreenSpaceLensFlare;
         optionsMenuUI.SetActive(false);
 
         if (GameManager.particleEffectsEnabled)
@@ -147,6 +153,12 @@ public class MainMenuScript : MonoBehaviour
         updatedOptionsData.hasBloom = bloomToggle.isOn;
         Toggle fxaaToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[5];
         updatedOptionsData.hasFXAA = fxaaToggle.isOn;
+        Toggle colorAdjToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[6];
+        updatedOptionsData.hasColorAdjustments = colorAdjToggle.isOn;
+        Toggle lensDistToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[7];
+        updatedOptionsData.hasLensDistortion = lensDistToggle.isOn;
+        Toggle lensFlareToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[8];
+        updatedOptionsData.hasScreenSpaceLensFlare = lensFlareToggle.isOn;
         GameManager.SaveOptionsData(updatedOptionsData);
 
         optionsMenuUI.SetActive(false);

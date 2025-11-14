@@ -6,7 +6,7 @@ public class CheckpointScript : MonoBehaviour
 {
     [SerializeField]
     public int checkpointNumber = 0;
-    public BoxCollider collider;
+    public BoxCollider2D collider;
     public ParticleSystem checkpointBeam;
     public Light checkpointLight; 
 
@@ -16,14 +16,14 @@ public class CheckpointScript : MonoBehaviour
         checkpointLight.gameObject.SetActive(false);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag.Equals("Player") && GameManager.playerCheckpoint != checkpointNumber)
         {
             GameManager.playerCheckpoint = checkpointNumber;
 
             // Turn on particle effect for this checkpoint and turn off effect for other checkpoints
-            CheckpointScript[] checkpoints = FindObjectsOfType<CheckpointScript>();
+            CheckpointScript[] checkpoints = FindObjectsByType<CheckpointScript>(FindObjectsSortMode.None);
             foreach(CheckpointScript cp in checkpoints)
             {
                 if (cp.checkpointNumber != GameManager.playerCheckpoint)

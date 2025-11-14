@@ -80,6 +80,12 @@ public class GameUIScript : MonoBehaviour
         bloomToggle.isOn = optionsData.hasBloom;
         Toggle fxaaToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[5];
         fxaaToggle.isOn = optionsData.hasFXAA;
+        Toggle colorAdjToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[6];
+        colorAdjToggle.isOn = optionsData.hasColorAdjustments;
+        Toggle lensDistToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[7];
+        lensDistToggle.isOn = optionsData.hasLensDistortion;
+        Toggle lensFlareToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[8];
+        lensFlareToggle.isOn = optionsData.hasScreenSpaceLensFlare;
         pauseUI.SetActive(false);
         optionsMenuUI.SetActive(false);
     }
@@ -173,6 +179,12 @@ public class GameUIScript : MonoBehaviour
         updatedOptionsData.hasBloom = bloomToggle.isOn;
         Toggle fxaaToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[5];
         updatedOptionsData.hasFXAA = fxaaToggle.isOn;
+        Toggle colorAdjToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[6];
+        updatedOptionsData.hasColorAdjustments = colorAdjToggle.isOn;
+        Toggle lensDistToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[7];
+        updatedOptionsData.hasLensDistortion = lensDistToggle.isOn;
+        Toggle lensFlareToggle = optionsMenuUI.GetComponentsInChildren<Toggle>()[8];
+        updatedOptionsData.hasScreenSpaceLensFlare = lensFlareToggle.isOn;
         GameManager.SaveOptionsData(updatedOptionsData);
 
         optionsMenuUI.SetActive(false);
@@ -189,19 +201,21 @@ public class GameUIScript : MonoBehaviour
 
     public void SaveAndReturnToMenu()
     {
-        SaveObject updatedSaveData = new SaveObject();
-        updatedSaveData.playerLocation = GameManager.playerLocation;
-        updatedSaveData.playerCheckpoint = GameManager.playerCheckpoint;
-        updatedSaveData.gemsCount = GameManager.gemsCount;
-        updatedSaveData.spiritCount = GameManager.spiritCount;
-        updatedSaveData.livesCount = GameManager.livesCount;
-        updatedSaveData.hasUpgrade1 = GameManager.hasUpgrade1;
-        updatedSaveData.hasUpgrade2 = GameManager.hasUpgrade2;
-        updatedSaveData.hasUpgrade3 = GameManager.hasUpgrade3;
-        updatedSaveData.hasCompletedEvent1 = GameManager.hasCompletedEvent1;
-        updatedSaveData.hasCompletedEvent2 = GameManager.hasCompletedEvent2;
-        updatedSaveData.hasCompletedEvent3 = GameManager.hasCompletedEvent3;
-        updatedSaveData.hasCompletedStory = GameManager.hasCompletedStory;
+        SaveObject updatedSaveData = new SaveObject
+        {
+            playerLocation = GameManager.playerLocation,
+            playerCheckpoint = GameManager.playerCheckpoint,
+            gemsCount = GameManager.gemsCount,
+            spiritCount = GameManager.spiritCount,
+            livesCount = GameManager.livesCount,
+            hasUpgrade1 = GameManager.hasUpgrade1,
+            hasUpgrade2 = GameManager.hasUpgrade2,
+            hasUpgrade3 = GameManager.hasUpgrade3,
+            hasCompletedEvent1 = GameManager.hasCompletedEvent1,
+            hasCompletedEvent2 = GameManager.hasCompletedEvent2,
+            hasCompletedEvent3 = GameManager.hasCompletedEvent3,
+            hasCompletedStory = GameManager.hasCompletedStory
+        };
         GameManager.SaveSlotData(updatedSaveData, GameManager.currentlySelectedSaveSlot);
 
         Time.timeScale = 1;
@@ -209,11 +223,12 @@ public class GameUIScript : MonoBehaviour
         GameManager.isPaused = false;
         GameManager.timeScale = 1.0f;
         GameManager.isTimeSlow = false;
-        ColorAdjustments colorAdjustments;
-        postprocessingVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments);
+        postprocessingVolume.profile.TryGet<ColorAdjustments>(out ColorAdjustments colorAdjustments);
         colorAdjustments.saturation.value = 0;
-
-
+        postprocessingVolume.profile.TryGet<LensDistortion>(out LensDistortion lensDistortion);
+        lensDistortion.intensity.value = 0;
+        postprocessingVolume.profile.TryGet<ScreenSpaceLensFlare>(out ScreenSpaceLensFlare lensFlare);
+        lensFlare.intensity.value = 0;
 
         GameManager.LoadScene(1, 0.3f);
     }
@@ -241,7 +256,7 @@ public class GameUIScript : MonoBehaviour
 
     public void SlowTimeBarAnimation(int playerNumber)
     {
-        timeBarAnimation = StartCoroutine(PlayerTimeControlUISlow(0.5f, playerNumber));
+        timeBarAnimation = StartCoroutine(PlayerTimeControlUISlow(0.25f, playerNumber));
     }
 
     public void ReturnNormalTimeBar(int playerNumber)

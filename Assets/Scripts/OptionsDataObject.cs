@@ -9,4 +9,7 @@ public class OptionsDataObject
     public bool hasSSAO = true;
     public bool hasBloom = true;
     public bool hasFXAA = true;
+    public bool hasColorAdjustments = true;
+    public bool hasLensDistortion = true;
+    public bool hasScreenSpaceLensFlare = true;
 }
