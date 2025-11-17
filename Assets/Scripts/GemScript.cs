@@ -23,14 +23,14 @@ public class GemScript : MonoBehaviour
         Vector3 adjustedPos = new Vector3(originalPos.x, originalPos.y + 0.4f, originalPos.z);
         while (true)
         {
-            for(float i = 0; i < 1; i += (Time.deltaTime / duration) * GameManager.timeScale)
+            for(float i = 0; i < 1; i += (Time.deltaTime / duration) * GameManager.nonPlayerTimeScale * GameManager.timeScale)
             {
                 gameObject.transform.position = Vector3.Lerp(originalPos, adjustedPos, Mathf.SmoothStep(0.0f, 1.0f, i));
                 yield return null;
             }
             gameObject.transform.position = adjustedPos;
 
-            for (float i = 0; i < 1; i += (Time.deltaTime / duration) * GameManager.timeScale)
+            for (float i = 0; i < 1; i += (Time.deltaTime / duration) * GameManager.nonPlayerTimeScale * GameManager.timeScale)
             {
                 gameObject.transform.position = Vector3.Lerp(adjustedPos, originalPos, Mathf.SmoothStep(0.0f, 1.0f, i));
                 yield return null;
@@ -41,12 +41,13 @@ public class GemScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        //print("other collider: " + other.gameObject.name + " | tag: " + other.tag);
         if (other.tag.Equals("Player"))
         {
             collider.enabled = false;
             GameManager.gemsCount += 1;
-            //CameraFollowScript camScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollowScript>();
-            //camScript.ShakeCamera(0.00001f);
+            CameraFollowScript camScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollowScript>();
+            camScript.ShakeCamera(0.001f);
             GameUIScript gameUI = GameObject.FindGameObjectWithTag("InGameUI").GetComponent<GameUIScript>();
             gameUI.UpdateGemsCountOnUI();
 

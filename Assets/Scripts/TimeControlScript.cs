@@ -10,7 +10,7 @@ public class TimeControlScript : MonoBehaviour
     private ColorAdjustments colorAdjustments = null;
     private LensDistortion lensDistortion = null;
     private ScreenSpaceLensFlare lensFlare = null;
-    private PlayerControllerScript playerScript;
+    private PlayerMovement playerScript;
     private GameUIScript inGameUI;
     private RectTransform playerFrontTimeBar;
     private Vector3 playerTimeBarLocalScale;
@@ -34,7 +34,7 @@ public class TimeControlScript : MonoBehaviour
         {
             Debug.Log("No global volume found in this scene: " + e.Message);
         }
-        playerScript = GetComponent<PlayerControllerScript>();
+        playerScript = GetComponent<PlayerMovement>();
         inGameUI = GameObject.FindGameObjectWithTag("InGameUI").GetComponent<GameUIScript>();
         if (playerScript.playerNumber == 1)
         {
@@ -95,7 +95,7 @@ public class TimeControlScript : MonoBehaviour
         GameManager.isTimeSlow = true;
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {
-            GameManager.timeScale = Mathf.Lerp(1f, 0.1f, i);
+            GameManager.nonPlayerTimeScale = Mathf.Lerp(1f, 0.1f, i);
             colorAdjustments.saturation.value = Mathf.Lerp(0f, -30f, i);
             lensDistortion.intensity.value = Mathf.Lerp(0f, 0.4f, i);
             lensFlare.intensity.value = Mathf.Lerp(0f, 3f, i);
@@ -104,7 +104,7 @@ public class TimeControlScript : MonoBehaviour
         colorAdjustments.saturation.value = -30;
         lensDistortion.intensity.value = 0.4f;
         lensFlare.intensity.value = 3;
-        GameManager.timeScale = 0.1f;
+        GameManager.nonPlayerTimeScale = 0.1f;
     }
 
     private IEnumerator ReturnNormalTimeAnimation(float duration)
@@ -112,7 +112,7 @@ public class TimeControlScript : MonoBehaviour
         GameManager.isTimeSlow = false;
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {
-            GameManager.timeScale = Mathf.Lerp(0.1f, 1f, i);
+            GameManager.nonPlayerTimeScale = Mathf.Lerp(0.1f, 1f, i);
             colorAdjustments.saturation.value = Mathf.Lerp(-30f, 0f, i);
             lensDistortion.intensity.value = Mathf.Lerp(0.4f, 0f, i);
             lensFlare.intensity.value = Mathf.Lerp(3f, 0f, i);
@@ -121,18 +121,19 @@ public class TimeControlScript : MonoBehaviour
         colorAdjustments.saturation.value = 0;
         lensDistortion.intensity.value = 0;
         lensFlare.intensity.value = 0;
-        GameManager.timeScale = 1.0f;
+        GameManager.nonPlayerTimeScale = 1.0f;
     }
 
     private IEnumerator TemporarilyHaltIncrease(float duration)
     {
-        playerScript.timeHalted = true;
+
+        playerScript.isTimeHalted = true;
         decreasePlayerTimeValue = false;
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {
             yield return null;
         }
         increasePlayerTimeValue = true;
-        playerScript.timeHalted = false;
+        playerScript.isTimeHalted = false;
     }
 }

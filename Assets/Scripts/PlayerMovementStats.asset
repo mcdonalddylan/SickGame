@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3678b47facf943b49a7853e987727186, type: 3}
+  m_Name: PlayerMovementStats
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovementStats
+  moveThreshold: 0.25
+  maxRunSpeed: 15
+  groundAcceleration: 5
+  groundDeceleration: 40
+  airAcceleration: 5
+  airDeceleration: 5
+  turningSpeed: 0.77
+  wallJumpMoveAcceleration: 5
+  wallJumpMoveDeceleration: 5
+  wallJumpDirection: {x: -20, y: 6.5}
+  postWallJumpBufferTime: 0.125
+  wallJumpGravityOnReleaseMultiplier: 1
+  resetJumpsOnWallSlide: 1
+  wallSlideSpeed: 5
+  wallSlideDecelerationSpeed: 50
+  dashTime: 0.11
+  dashSpeed: 40
+  timeBtwDashesOnGround: 0.225
+  resetDashOnWallSlide: 1
+  numberOfDashesAllowed: 2
+  dashDiagonallyBias: 0.4
+  dashGravityOnReleaseMultiplier: 1
+  dashTimeForUpwardsCancel: 0.027
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  groundDetectionRayLength: 0.02
+  headDetectionRayLength: 0.02
+  headWidth: 0.75
+  wallDetectionRayLength: 0.3
+  wallDetectionRayHeightMultiplier: 0.56
+  jumpHeight: 6.5
+  jumpHeightCompensationFactor: 1.054
+  timeTillJumpApex: 0.35
+  gravityOnReleaseMultiplier: 2
+  maxFallSpeed: 26
+  numberOfJumpsAllowed: 2
+  timeForUpwardsCancel: 0.027
+  apexThreshold: 0.97
+  apexHangTime: 0.075
+  jumpBufferTime: 0.125
+  jumpCoyoteTime: 0.1
+  debugShowIsGroundedBox: 1
+  debugShowHeadBumpBox: 1
+  debugShowWallClingBox: 1
+  forcedFastFallMovementTriggerRange: 0.9
+  forcedFastFallSpeed: 20

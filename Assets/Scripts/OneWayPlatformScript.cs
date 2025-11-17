@@ -4,25 +4,25 @@ using UnityEngine;
 
 public class OneWayPlatformScript : MonoBehaviour
 {
-    //public BoxCollider2D solidCollider = null;
-    //private new BoxCollider2D collisionCheckTrigger = null;
-    //[SerializeField]
-    //private Vector3 entryDirection = Vector3.up;
+    private BoxCollider2D solidCollider = null;
+    private new BoxCollider2D collisionCheckTrigger = null;
+    [SerializeField]
+    private Vector3 entryDirection = Vector3.up;
 
-    //void Awake()
-    //{
+    // void Awake()
+    // {
     //    //entryDirection = transform.TransformDirection(entryDirection);
     //    solidCollider = gameObject.GetComponent<BoxCollider2D>();
-    //    solidCollider.isTrigger = false;
+    //    solidCollider.isTrigger = true;
 
     //    collisionCheckTrigger = gameObject.AddComponent<BoxCollider2D>();
-    //    collisionCheckTrigger.size = new Vector3(solidCollider.size.x * 1.5f, solidCollider.size.y * 2f);
-    //    collisionCheckTrigger.center = solidCollider.center;
+    //    collisionCheckTrigger.size = new Vector3(solidCollider.size.x, solidCollider.size.y * 1.1f);
+    //    collisionCheckTrigger.offset = solidCollider.offset;
     //    collisionCheckTrigger.isTrigger = true;
-    //}
+    // }
 
-    //private void OnTriggerStay(Collider other)
-    //{
+    // private void OnTriggerStay(Collider other)
+    // {
     //    if (other.tag.Equals("Player") && Physics.ComputePenetration(
     //        collisionCheckTrigger,
     //        transform.position,
@@ -48,7 +48,5 @@ public class OneWayPlatformScript : MonoBehaviour
     //            Physics.IgnoreCollision(GetComponent<Collider>(), other, true);
     //        }
     //    }
-    //}
-
-
+    // }
 }
