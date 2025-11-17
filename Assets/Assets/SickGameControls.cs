@@ -93,28 +93,19 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
             ""id"": ""106ebb1c-711f-4d31-a8b3-c1a7d011431e"",
             ""actions"": [
                 {
-                    ""name"": ""HorizontalMovement"",
-                    ""type"": ""PassThrough"",
-                    ""id"": ""c7db0b30-3491-456c-a944-4a9c917e4b63"",
-                    ""expectedControlType"": ""Axis"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""VerticalMovement"",
+                    ""name"": ""Move"",
                     ""type"": ""PassThrough"",
                     ""id"": ""93b806c4-ab2c-4e35-9c70-82f6335ef9f5"",
-                    ""expectedControlType"": ""Axis"",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""3e785e2f-743e-4978-ba70-994bd60f4e6a"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -123,7 +114,7 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
                     ""name"": ""NormalAttack"",
                     ""type"": ""Button"",
                     ""id"": ""9e15bb88-8f26-4f90-996b-288f30fbae28"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -132,7 +123,7 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
                     ""name"": ""SpecialAttack"",
                     ""type"": ""Button"",
                     ""id"": ""3e50a310-a7ad-4ac4-88a5-be051e9ea69c"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -141,7 +132,7 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
                     ""name"": ""TimeControl"",
                     ""type"": ""Button"",
                     ""id"": ""ba2db84b-eb65-48e5-bae5-967cee673a89"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -150,66 +141,22 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
                     ""name"": ""Pause"",
                     ""type"": ""Button"",
                     ""id"": ""a13ecee4-c3bf-4372-bfcb-32824e525020"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""AirDash"",
+                    ""name"": ""Dash"",
                     ""type"": ""Button"",
                     ""id"": ""860cd0c2-b16c-432a-9533-c2cf1c9760cd"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""d16b84bc-f3cc-41f5-a213-04076a16cce5"",
-                    ""path"": ""<Gamepad>/leftStick/x"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Controller"",
-                    ""action"": ""HorizontalMovement"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""ADKeys"",
-                    ""id"": ""70bb8093-7441-4146-9827-90c562f65bb2"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""HorizontalMovement"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""d9a6c7b4-df57-418f-95ef-08e2ef8dd50b"",
-                    ""path"": ""<Keyboard>/a"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard"",
-                    ""action"": ""HorizontalMovement"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""f19f3917-6e47-4bb2-b937-61a08f6d4d29"",
-                    ""path"": ""<Keyboard>/d"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard"",
-                    ""action"": ""HorizontalMovement"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
                 {
                     ""name"": """",
                     ""id"": ""575ac5a4-61d8-40bf-9ef9-490073f837d9"",
@@ -334,55 +281,77 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""797e462d-5877-427e-be84-f4db3b92bb50"",
-                    ""path"": ""<Gamepad>/leftStick/y"",
+                    ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Controller"",
-                    ""action"": ""VerticalMovement"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""WSKeys"",
+                    ""name"": ""WASD Keys"",
                     ""id"": ""8d972b6a-758f-4e13-98bd-61e6bf17bc06"",
-                    ""path"": ""1DAxis"",
+                    ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""VerticalMovement"",
+                    ""action"": ""Move"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""negative"",
+                    ""name"": ""Up"",
                     ""id"": ""823bc035-fcf3-4856-931d-d06385acbda1"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""VerticalMovement"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""positive"",
+                    ""name"": ""Down"",
+                    ""id"": ""39406f28-caa5-4b42-95e9-6ea527fce809"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Left"",
+                    ""id"": ""860feccb-cfe4-41a4-91dc-499d0aaf6b3f"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Right"",
                     ""id"": ""c74529fd-5537-4815-bbe8-a1d38bbbd00f"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""VerticalMovement"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
                     ""id"": ""e15e3e9d-09bb-46a3-82fd-838df94adbe0"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Controller"",
-                    ""action"": ""AirDash"",
+                    ""action"": ""Dash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -393,7 +362,7 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
-                    ""action"": ""AirDash"",
+                    ""action"": ""Dash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -427,14 +396,13 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
 }");
         // Player1
         m_Player1 = asset.FindActionMap("Player1", throwIfNotFound: true);
-        m_Player1_HorizontalMovement = m_Player1.FindAction("HorizontalMovement", throwIfNotFound: true);
-        m_Player1_VerticalMovement = m_Player1.FindAction("VerticalMovement", throwIfNotFound: true);
+        m_Player1_Move = m_Player1.FindAction("Move", throwIfNotFound: true);
         m_Player1_Jump = m_Player1.FindAction("Jump", throwIfNotFound: true);
         m_Player1_NormalAttack = m_Player1.FindAction("NormalAttack", throwIfNotFound: true);
         m_Player1_SpecialAttack = m_Player1.FindAction("SpecialAttack", throwIfNotFound: true);
         m_Player1_TimeControl = m_Player1.FindAction("TimeControl", throwIfNotFound: true);
         m_Player1_Pause = m_Player1.FindAction("Pause", throwIfNotFound: true);
-        m_Player1_AirDash = m_Player1.FindAction("AirDash", throwIfNotFound: true);
+        m_Player1_Dash = m_Player1.FindAction("Dash", throwIfNotFound: true);
     }
 
     ~@SickGameControls()
@@ -515,14 +483,13 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
     // Player1
     private readonly InputActionMap m_Player1;
     private List<IPlayer1Actions> m_Player1ActionsCallbackInterfaces = new List<IPlayer1Actions>();
-    private readonly InputAction m_Player1_HorizontalMovement;
-    private readonly InputAction m_Player1_VerticalMovement;
+    private readonly InputAction m_Player1_Move;
     private readonly InputAction m_Player1_Jump;
     private readonly InputAction m_Player1_NormalAttack;
     private readonly InputAction m_Player1_SpecialAttack;
     private readonly InputAction m_Player1_TimeControl;
     private readonly InputAction m_Player1_Pause;
-    private readonly InputAction m_Player1_AirDash;
+    private readonly InputAction m_Player1_Dash;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player1".
     /// </summary>
@@ -535,13 +502,9 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
         /// </summary>
         public Player1Actions(@SickGameControls wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "Player1/HorizontalMovement".
+        /// Provides access to the underlying input action "Player1/Move".
         /// </summary>
-        public InputAction @HorizontalMovement => m_Wrapper.m_Player1_HorizontalMovement;
-        /// <summary>
-        /// Provides access to the underlying input action "Player1/VerticalMovement".
-        /// </summary>
-        public InputAction @VerticalMovement => m_Wrapper.m_Player1_VerticalMovement;
+        public InputAction @Move => m_Wrapper.m_Player1_Move;
         /// <summary>
         /// Provides access to the underlying input action "Player1/Jump".
         /// </summary>
@@ -563,9 +526,9 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Pause => m_Wrapper.m_Player1_Pause;
         /// <summary>
-        /// Provides access to the underlying input action "Player1/AirDash".
+        /// Provides access to the underlying input action "Player1/Dash".
         /// </summary>
-        public InputAction @AirDash => m_Wrapper.m_Player1_AirDash;
+        public InputAction @Dash => m_Wrapper.m_Player1_Dash;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -592,12 +555,9 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_Player1ActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_Player1ActionsCallbackInterfaces.Add(instance);
-            @HorizontalMovement.started += instance.OnHorizontalMovement;
-            @HorizontalMovement.performed += instance.OnHorizontalMovement;
-            @HorizontalMovement.canceled += instance.OnHorizontalMovement;
-            @VerticalMovement.started += instance.OnVerticalMovement;
-            @VerticalMovement.performed += instance.OnVerticalMovement;
-            @VerticalMovement.canceled += instance.OnVerticalMovement;
+            @Move.started += instance.OnMove;
+            @Move.performed += instance.OnMove;
+            @Move.canceled += instance.OnMove;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
@@ -613,9 +573,9 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
-            @AirDash.started += instance.OnAirDash;
-            @AirDash.performed += instance.OnAirDash;
-            @AirDash.canceled += instance.OnAirDash;
+            @Dash.started += instance.OnDash;
+            @Dash.performed += instance.OnDash;
+            @Dash.canceled += instance.OnDash;
         }
 
         /// <summary>
@@ -627,12 +587,9 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
         /// <seealso cref="Player1Actions" />
         private void UnregisterCallbacks(IPlayer1Actions instance)
         {
-            @HorizontalMovement.started -= instance.OnHorizontalMovement;
-            @HorizontalMovement.performed -= instance.OnHorizontalMovement;
-            @HorizontalMovement.canceled -= instance.OnHorizontalMovement;
-            @VerticalMovement.started -= instance.OnVerticalMovement;
-            @VerticalMovement.performed -= instance.OnVerticalMovement;
-            @VerticalMovement.canceled -= instance.OnVerticalMovement;
+            @Move.started -= instance.OnMove;
+            @Move.performed -= instance.OnMove;
+            @Move.canceled -= instance.OnMove;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
@@ -648,9 +605,9 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
-            @AirDash.started -= instance.OnAirDash;
-            @AirDash.performed -= instance.OnAirDash;
-            @AirDash.canceled -= instance.OnAirDash;
+            @Dash.started -= instance.OnDash;
+            @Dash.performed -= instance.OnDash;
+            @Dash.canceled -= instance.OnDash;
         }
 
         /// <summary>
@@ -718,19 +675,12 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
     public interface IPlayer1Actions
     {
         /// <summary>
-        /// Method invoked when associated input action "HorizontalMovement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Move" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnHorizontalMovement(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "VerticalMovement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnVerticalMovement(InputAction.CallbackContext context);
+        void OnMove(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -767,11 +717,11 @@ public partial class @SickGameControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPause(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "AirDash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Dash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnAirDash(InputAction.CallbackContext context);
+        void OnDash(InputAction.CallbackContext context);
     }
 }

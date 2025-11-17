@@ -48,7 +48,7 @@ public class PlayerParticleScript : MonoBehaviour
 
     public void EmitDashTrail()
     {
-        StartCoroutine(BrieflyEmitTrailAnimation(0.3f));
+        StartCoroutine(BrieflyEmitTrailAnimation(0.2f));
     }
 
     private IEnumerator BrieflyEmitTrailAnimation(float duration)

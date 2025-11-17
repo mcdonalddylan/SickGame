@@ -10,7 +10,7 @@ public class CameraFollowScript : MonoBehaviour
     [SerializeField]
     private Vector3 offset;
     [SerializeField]
-    private float smoothSpeedFactor = 0.125f;
+    private float smoothSpeedFactor;
 
     public bool isFollowingPlayer = true;
 
@@ -18,13 +18,20 @@ public class CameraFollowScript : MonoBehaviour
 
     public GameObject temporaryTarget;
 
+    private Rigidbody2D targetRb;
+
+    private void Awake()
+    {
+        targetRb = playerTarget.gameObject.GetComponent<Rigidbody2D>();
+    }
+
     // Called after every other update
     private void LateUpdate()
     {
         if (isFollowingPlayer)
         {
             // If the player is facing the right direction, use the "right facing" camera offset
-            if (playerTarget.gameObject.GetComponent<PlayerControllerScript>().faceRightState)
+            if (playerTarget.gameObject.GetComponent<PlayerMovement>().isFacingRight)
             {
                 offset = FACE_RIGHT_OFFSET;
             }
@@ -34,16 +41,14 @@ public class CameraFollowScript : MonoBehaviour
                 offset = FACE_LEFT_OFFSET;
             }
             // If the player's speed is greater than 1, increase the smooth speed to the normal amount
-            if (Mathf.Abs(playerTarget.gameObject.GetComponent<PlayerControllerScript>().playerXVelocity) >= 1 ||
-                playerTarget.gameObject.GetComponent<PlayerControllerScript>().playerYVelocity > 1 ||
-                playerTarget.gameObject.GetComponent<PlayerControllerScript>().playerYVelocity < -1.1f)
+            if (Mathf.Abs(targetRb.linearVelocity.x) >= 1f || targetRb.linearVelocity.y > 1f || targetRb.linearVelocity.y < -1.1f)
             {
-                smoothSpeedFactor = 0.125f;
+                smoothSpeedFactor = 0.4f;
             }
             // If the player's speed is greater than 1, increase the smooth speed to the normal amount
             else
             {
-                smoothSpeedFactor = 0.65f;
+                smoothSpeedFactor = 0.4f;
             }
             Vector3 desiredPosition = playerTarget.position + offset;
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, smoothSpeedFactor);

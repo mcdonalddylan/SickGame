@@ -90,30 +90,33 @@ public class GameUIScript : MonoBehaviour
         optionsMenuUI.SetActive(false);
     }
 
-    public void HandlePausedPressed(InputAction.CallbackContext context)
+    private void Update()
     {
-        if (context.performed && !pauseUI.activeSelf)
+        CheckForPause();
+        CheckForCancel();
+    }
+
+    public void CheckForCancel()
+    {
+        if (InputManager.specialOrCancelWasPressed && GameManager.isPaused && optionsMenuUI.activeSelf)
         {
-            ActivatePause();
+            CloseAndSaveOptionsMenu();
         }
-        else if (context.performed && pauseUI.activeSelf && !optionsMenuUI)
+        else if (InputManager.specialOrCancelWasPressed && GameManager.isPaused)
         {
             DeactivatePause();
         }
     }
 
-    public void HandlePressingCancel(InputAction.CallbackContext context)
+    public void CheckForPause()
     {
-        if (context.performed && GameManager.isPaused)
+        if (InputManager.pauseWasPressed && !pauseUI.activeSelf)
         {
-            if (optionsMenuUI.activeSelf)
-            {
-                CloseAndSaveOptionsMenu();
-            }
-            else
-            {
-                DeactivatePause();
-            }
+            ActivatePause();
+        }
+        else if (InputManager.pauseWasPressed && pauseUI.activeSelf && !optionsMenuUI)
+        {
+            DeactivatePause();
         }
     }
 
@@ -222,6 +225,7 @@ public class GameUIScript : MonoBehaviour
         AudioListener.pause = false;
         GameManager.isPaused = false;
         GameManager.timeScale = 1.0f;
+        GameManager.nonPlayerTimeScale = 1.0f;
         GameManager.isTimeSlow = false;
         postprocessingVolume.profile.TryGet<ColorAdjustments>(out ColorAdjustments colorAdjustments);
         colorAdjustments.saturation.value = 0;
@@ -282,6 +286,7 @@ public class GameUIScript : MonoBehaviour
 
         float originalYPos = 200f;
         Color originalColor = new Color32(50,50,50,255);
+
         // Jump and color fade animation
         for (float i = 0; i < 1; i += Time.deltaTime / duration)
         {
@@ -308,6 +313,7 @@ public class GameUIScript : MonoBehaviour
         {
             timeBarImage = player1FrontTimeControlBar.GetComponent<Image>();
         }
+
         while (true){
             for (float i = 0; i < 1; i += Time.deltaTime / duration)
             {
@@ -323,7 +329,6 @@ public class GameUIScript : MonoBehaviour
             }
             timeBarImage.color = TIME_CONTROLER_BAR_COLOR;
         }
-        
     }
 
     private IEnumerator UIFadeIn(CanvasGroup canvasGroup, float duration)
