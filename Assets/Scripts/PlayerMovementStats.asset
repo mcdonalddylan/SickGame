@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: PlayerMovementStats
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovementStats
   moveThreshold: 0.25
-  maxRunSpeed: 15
-  groundAcceleration: 5
-  groundDeceleration: 40
+  maxRunSpeed: 20
+  groundAcceleration: 8.5
+  groundDeceleration: 9.5
   airAcceleration: 5
   airDeceleration: 5
   turningSpeed: 0.77
@@ -38,11 +38,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  groundDetectionRayLength: 0.02
-  headDetectionRayLength: 0.02
-  headWidth: 0.75
-  wallDetectionRayLength: 0.3
-  wallDetectionRayHeightMultiplier: 0.56
   jumpHeight: 6.5
   jumpHeightCompensationFactor: 1.054
   timeTillJumpApex: 0.35
@@ -54,8 +49,9 @@ MonoBehaviour:
   apexHangTime: 0.075
   jumpBufferTime: 0.125
   jumpCoyoteTime: 0.1
-  debugShowIsGroundedBox: 1
-  debugShowHeadBumpBox: 1
-  debugShowWallClingBox: 1
+  debugShowIsGrounded: 1
+  debugShowHeadRays: 1
+  debugShowWallHit: 1
+  extraRayDebugDistance: 0.25
   forcedFastFallMovementTriggerRange: 0.9
-  forcedFastFallSpeed: 20
+  forcedFastFallSpeed: 50
