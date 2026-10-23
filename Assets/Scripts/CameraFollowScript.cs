@@ -3,14 +3,16 @@ using UnityEngine;
 
 public class CameraFollowScript : MonoBehaviour
 {
-    private Vector3 FACE_RIGHT_OFFSET = new Vector3(3.5f, 1.5f, -12);
-    private Vector3 FACE_LEFT_OFFSET = new Vector3(-3.5f, 1.5f, -12);
-    [SerializeField]
-    private Transform playerTarget;
-    [SerializeField]
-    private Vector3 offset;
-    [SerializeField]
-    private float smoothSpeedFactor;
+    private Vector3 FACE_RIGHT_OFFSET = new Vector3(3.5f, 2f, -12);
+    private Vector3 FACE_LEFT_OFFSET = new Vector3(-3.5f, 2f, -12);
+    private Vector3 WALL_SLIDE_RIGHT_OFFSET = new Vector3(5.5f, 1.5f, -12);
+    private Vector3 WALL_SLIDE_LEFT_OFFSET = new Vector3(-5.5f, 1.5f, -12);
+    private Vector3 FACE_RIGHT_FALLING_OFFSET = new Vector3(3f, -2.5f, -12);
+    private Vector3 FACE_LEFT_FALLING_OFFSET = new Vector3(-3f, -2.5f, -12);
+    [SerializeField] private Transform playerTarget;
+    [SerializeField] private Vector3 offset;
+    private float smoothSpeedFactor = 0.2f;
+    private bool isTargetFalling;
 
     public bool isFollowingPlayer = true;
 
@@ -19,10 +21,12 @@ public class CameraFollowScript : MonoBehaviour
     public GameObject temporaryTarget;
 
     private Rigidbody2D targetRb;
+    private PlayerMovement targetMovement;
 
     private void Awake()
     {
         targetRb = playerTarget.gameObject.GetComponent<Rigidbody2D>();
+        targetMovement = playerTarget.gameObject.GetComponent<PlayerMovement>();
     }
 
     // Called after every other update
@@ -30,28 +34,48 @@ public class CameraFollowScript : MonoBehaviour
     {
         if (isFollowingPlayer)
         {
-            // If the player is facing the right direction, use the "right facing" camera offset
-            if (playerTarget.gameObject.GetComponent<PlayerMovement>().isFacingRight)
+            IsTargetFalling();
+
+            if (targetMovement.isWallSliding && targetMovement.IsFacingRight)
+            {
+                offset = WALL_SLIDE_LEFT_OFFSET;
+            }
+            else if (targetMovement.isWallSliding && !targetMovement.IsFacingRight)
+            {
+                offset = WALL_SLIDE_RIGHT_OFFSET;
+            }
+            else if (!isTargetFalling && targetMovement.IsFacingRight)
             {
                 offset = FACE_RIGHT_OFFSET;
             }
-            // If the player is facing the left direction, use the "left facing" camera offset
-            else
+            else if (!isTargetFalling && !targetMovement.IsFacingRight)
             {
                 offset = FACE_LEFT_OFFSET;
             }
-            // If the player's speed is greater than 1, increase the smooth speed to the normal amount
-            if (Mathf.Abs(targetRb.linearVelocity.x) >= 1f || targetRb.linearVelocity.y > 1f || targetRb.linearVelocity.y < -1.1f)
+            else if (isTargetFalling && targetMovement.IsFacingRight)
             {
-                smoothSpeedFactor = 0.4f;
+                offset = FACE_RIGHT_FALLING_OFFSET;
             }
-            // If the player's speed is greater than 1, increase the smooth speed to the normal amount
-            else
+            else if (isTargetFalling && !targetMovement.IsFacingRight)
             {
-                smoothSpeedFactor = 0.4f;
+                offset = FACE_LEFT_FALLING_OFFSET;
             }
             Vector3 desiredPosition = playerTarget.position + offset;
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, smoothSpeedFactor);
+        }
+    }
+
+    private void IsTargetFalling()
+    {
+        if (targetMovement.fallTimer > 0.75f)
+        {
+            isTargetFalling = true;
+            smoothSpeedFactor = 0.1f;
+        }
+        else
+        {
+            isTargetFalling = false;
+            smoothSpeedFactor = 0.2f;
         }
     }
 

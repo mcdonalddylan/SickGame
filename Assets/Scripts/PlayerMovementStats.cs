@@ -5,9 +5,9 @@ public class PlayerMovementStats : ScriptableObject
 {
     [Header("Run")]
     [Range(0f, 1f)] public float moveThreshold = 0.25f;
-    [Range(1f, 100f)] public float maxRunSpeed = 12.5f;
-    [Range(0.25f, 50f)] public float groundAcceleration = 5f;
-    [Range(0.25f, 50f)] public float groundDeceleration = 20f;
+    [Range(1f, 100f)] public float maxRunSpeed = 20f;
+    [Range(0.25f, 50f)] public float groundAcceleration = 8.5f;
+    [Range(0.25f, 50f)] public float groundDeceleration = 9.5f;
     [Range(0.25f, 50f)] public float airAcceleration = 5f;
     [Range(0.25f, 50f)] public float airDeceleration = 5f;
     [Range(0f, 2f)] public float turningSpeed = 0.05f;
@@ -36,11 +36,6 @@ public class PlayerMovementStats : ScriptableObject
 
     [Header("Grounded/Collision Checks")]
     public LayerMask groundLayer;
-    public float groundDetectionRayLength = 0.02f;
-    public float headDetectionRayLength = 0.02f;
-    [Range(0f, 1f)] public float headWidth = 0.75f;
-    public float wallDetectionRayLength = 0.125f;
-    [Range(0.01f, 2f)] public float wallDetectionRayHeightMultiplier = 0.9f;
 
     [Header("Jump")]
     [Range(2f, 10f)] public float jumpHeight = 6.5f;
@@ -64,9 +59,10 @@ public class PlayerMovementStats : ScriptableObject
     [Range(0f, 1f)] public float jumpCoyoteTime = 0.1f;
 
     [Header("Debug")]
-    public bool debugShowIsGroundedBox;
-    public bool debugShowHeadBumpBox;
-    public bool debugShowWallClingBox;
+    public bool debugShowIsGrounded;
+    public bool debugShowHeadRays;
+    public bool debugShowWallHit;
+    [Range(0f, 1f)] public float extraRayDebugDistance = 0.25f;
 
     [Header("Forced Fast Fall")]
     [Range(0f, 1f)] public float forcedFastFallMovementTriggerRange = 0.9f;
