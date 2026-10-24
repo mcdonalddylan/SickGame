@@ -22,6 +22,7 @@ public class PlayerStateDisplay : MonoBehaviour
     public bool isDashing;
     public float fallTimer;
     public float coyoteTimer;
+    public float dropThroughHoldTimer;
 
     void Update()
     {
@@ -47,7 +48,8 @@ public class PlayerStateDisplay : MonoBehaviour
                              $"Forced Fast Falling: {(isForcedFastFalling ? "*TRUE*": "False")}\n" +
                              $"Dashing: {(isDashing ? "*TRUE*": "False")}\n" +
                              $"Fall Timer: {fallTimer}\n" +
-                             $"Coyote Timer: {coyoteTimer}\n";
+                             $"Coyote Timer: {coyoteTimer}\n" +
+                             $"Drop Through Hold Timer: {dropThroughHoldTimer}\n";
 
         // Update the UI text
         if (stateText != null)

@@ -16,6 +16,9 @@ Shader "Custom/CartoonShader"
         _OutlineThickness("Outline Thickness", Range(0.001,0.5)) = 0.015
         _WiggleAmount    ("Wiggle Amount", Range(0,0.05)) = 0.008
         _WiggleFPS       ("Wiggle FPS", Range(1,24)) = 6
+        [Toggle(_HEALTH_COLOR_ON)] _UseHealthColor ("Use Health Color", Float) = 0
+        _HealthColor     ("Health Color", Color) = (0.85,0.1,0.1,1)
+        _HealthDamage    ("Health Damage (0 = healthy, 1 = fully damaged)", Range(0,1)) = 0
     }
 
     SubShader
@@ -36,6 +39,7 @@ Shader "Custom/CartoonShader"
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma shader_feature_local_fragment _HEALTH_COLOR_ON
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
@@ -65,6 +69,8 @@ Shader "Custom/CartoonShader"
             float  _HighlightOpacity;
             float  _HighlightSoftness;
             float  _Threshold;
+            float4 _HealthColor;
+            float  _HealthDamage;
 
             // Vertex stage: transforms the vertex to clip space and passes the world-space
             // normal and position on for lighting and shadow lookups in the fragment stage
@@ -86,6 +92,12 @@ Shader "Custom/CartoonShader"
                 float4 tex      = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, i.uv);
                 float4 baseResult  = _BaseColor * tex;
                 float4 adjustedShadeColor = lerp(_BaseColor, _ShadeColor, _ShadeColorOpacity) * tex;
+#if defined(_HEALTH_COLOR_ON)
+                // The health color slowly takes over the base color/texture as damage grows
+                float4 healthShade = _HealthColor * lerp(float4(1,1,1,1), _ShadeColor, _ShadeColorOpacity);
+                baseResult = lerp(baseResult, _HealthColor, _HealthDamage);
+                adjustedShadeColor = lerp(adjustedShadeColor, healthShade, _HealthDamage);
+#endif
 
                 // Main light: the shadow coord lets GetMainLight sample the shadow map, so shadows
                 // cast by other objects onto this one are included in shadowAttenuation
