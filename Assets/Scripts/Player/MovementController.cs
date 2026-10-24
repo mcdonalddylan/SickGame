@@ -16,7 +16,18 @@ public class MovementController : MonoBehaviour
 
     // Layer of one-way platforms: solid only when landing on them from above
     private const string OneWayLayerName = "OneWayGround";
+    private const string EnemyLayerName = "Enemy";
     private int oneWayMask;
+    private int enemyMask;
+
+    // Ground plus enemies: enemies are solid to the player like ground
+    private int SolidMask => moveStats.groundLayer.value | enemyMask;
+
+    // How long one-way platforms are ignored after the player chooses to drop through them
+    [SerializeField, Min(0.05f)] private float dropThroughDuration = 0.3f;
+    private float dropThroughEndTime;
+    private Collider dropThroughCollider;
+    private Collider oneWayGroundCollider;
 
     // Reused buffer for sweeps that need every surface along the path (avoids per-frame allocations)
     private readonly RaycastHit[] sweepHits = new RaycastHit[16];
@@ -37,6 +48,9 @@ public class MovementController : MonoBehaviour
 
     public bool isCollidingAbove { get; private set; }
     public bool isCollidingBelow { get; private set; }
+
+    // Collider the player is currently standing on (null in the air)
+    public Collider GroundCollider { get; private set; }
     public bool isCollidingLeft { get; private set; }
     public bool isCollidingRight { get; private set; }
 
@@ -47,6 +61,7 @@ public class MovementController : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         moveStats = playerMovement.playerMovementStats;
         oneWayMask = LayerMask.GetMask(OneWayLayerName);
+        enemyMask = LayerMask.GetMask(EnemyLayerName);
     }
 
     // Resolves the desired per-frame displacement against the ground layer, then moves the body.
@@ -198,6 +213,8 @@ public class MovementController : MonoBehaviour
         if (direction < 0f)
         {
             isCollidingBelow = true;
+            GroundCollider = hit.collider;
+            if (hitIsOneWay) oneWayGroundCollider = hit.collider;
             groundPlatform = hit.collider.GetComponentInParent<MovingPlatformScript>();
         }
         else isCollidingAbove = true;
@@ -258,7 +275,21 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    // Downward sweep against one-way platforms. A platform only counts if the player's feet are already
+    // True while standing on a one-way platform (not normal ground)
+    public bool IsStandingOnOneWay => isCollidingBelow && oneWayGroundCollider != null;
+
+    // Lets the player fall through only the one-way platform currently stood on, for a short time.
+    // Other one-way platforms below still catch the player.
+    public void DropThroughOneWay()
+    {
+        if (oneWayGroundCollider == null)
+            return;
+
+        dropThroughCollider = oneWayGroundCollider;
+        dropThroughEndTime = Time.time + dropThroughDuration;
+    }
+
+    // Downward sweep against one-way platforms.
     // above its top surface, so the player passes up through it from below and from the side, but lands on top.
     // Casts ignore colliders they start inside of, which also lets the player drop through while overlapping.
     private bool SweepOneWay(Vector3 offset, float distance, out RaycastHit result)
@@ -289,6 +320,10 @@ public class MovementController : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             RaycastHit candidate = sweepHits[i];
+
+            // The platform the player is dropping through is ignored for a short time
+            if (candidate.collider == dropThroughCollider && Time.time < dropThroughEndTime)
+                continue;
 
             // Only surfaces facing up that are walkable, hits that start inside a collider have no valid data
             if (candidate.distance <= 0f || Vector3.Angle(candidate.normal, Vector3.up) > maxSlopeAngle)
@@ -326,7 +361,7 @@ public class MovementController : MonoBehaviour
             out hit,
             Quaternion.identity,
             distance,
-            moveStats.groundLayer,
+            SolidMask,
             QueryTriggerInteraction.Ignore);
 
         DrawDebug(center + offset, direction, distance, didHit);
@@ -359,7 +394,7 @@ public class MovementController : MonoBehaviour
             sweepHits,
             Quaternion.identity,
             distance,
-            moveStats.groundLayer,
+            SolidMask,
             QueryTriggerInteraction.Ignore);
 
         blockingHit = default;
@@ -405,6 +440,8 @@ public class MovementController : MonoBehaviour
         isCollidingBelow = false;
         isCollidingLeft = false;
         isCollidingRight = false;
+        oneWayGroundCollider = null;
+        GroundCollider = null;
     }
 
     #region Public Helper Methods

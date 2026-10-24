@@ -58,6 +58,10 @@ public class PlayerMovementStats : ScriptableObject
     [Header("Jump Coyote Time")]
     [Range(0f, 1f)] public float jumpCoyoteTime = 0.1f;
 
+    [Header("Drop Through One-Way Platforms")]
+    [Tooltip("Seconds the player must stay grounded while holding down before falling through a one-way platform")]
+    [Range(0f, 1f)] public float dropThroughHoldTime = 0.15f;
+
     [Header("Debug")]
     public bool debugShowIsGrounded;
     public bool debugShowHeadRays;

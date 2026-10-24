@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class InputManager : MonoBehaviour
 {
@@ -13,6 +14,11 @@ public class InputManager : MonoBehaviour
     public static bool specialOrCancelWasPressed;
     public static bool timeControlWasPressed;
     public static bool dashWasPressed;
+
+    // Analog sticks need to be pushed at least this far down to drop through one-way platforms
+    public const float AnalogDropThreshold = 0.5f;
+    public static bool moveIsAnalog;
+    public static bool dropThroughHeld;
 
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -36,6 +42,13 @@ public class InputManager : MonoBehaviour
     private void Update()
     {
         movement = moveAction.ReadValue<Vector2>();
+
+        InputControl activeControl = moveAction.activeControl;
+        if (activeControl != null)
+        {
+            moveIsAnalog = !(activeControl.device is Keyboard) && !(activeControl.parent is DpadControl);
+        }
+        dropThroughHeld = moveIsAnalog ? movement.y <= -AnalogDropThreshold : movement.y < 0f;
     
         jumpWasPressed = jumpAction.WasPressedThisFrame();
         jumpIsHeld = jumpAction.IsPressed();

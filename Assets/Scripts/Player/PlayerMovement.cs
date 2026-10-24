@@ -86,6 +86,9 @@ public class PlayerMovement : MonoBehaviour
     // Forced fast fall vars
     public bool isForcedFastFalling;
 
+    // Drop through one-way platform vars
+    private float dropThroughHoldTimer;
+
     private void Awake()
     {
         IsFacingRight = true;
@@ -139,6 +142,20 @@ public class PlayerMovement : MonoBehaviour
         ForcedFastFall(timeStep);
 
         ClampVelocity();
+
+        if (InputManager.dropThroughHeld && Controller.IsStandingOnOneWay)
+        {
+            dropThroughHoldTimer += timeStep;
+            if (dropThroughHoldTimer >= playerMovementStats.dropThroughHoldTime)
+            {
+                Controller.DropThroughOneWay();
+                dropThroughHoldTimer = 0f;
+            }
+        }
+        else
+        {
+            dropThroughHoldTimer = 0f;
+        }
 
         Controller.Move(new Vector3(velocity.x, velocity.y, 0f) * timeStep);
 
@@ -955,6 +972,7 @@ public class PlayerMovement : MonoBehaviour
         stateDisplay.isDashing = isDashing;
         stateDisplay.fallTimer = fallTimer;
         stateDisplay.coyoteTimer = coyoteTimer;
+        stateDisplay.dropThroughHoldTimer = dropThroughHoldTimer;
     }
 
     #endregion
